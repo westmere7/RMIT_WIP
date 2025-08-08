@@ -3,16 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Excel A1 Viewer</title>
-  <!-- Include SheetJS -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <title>CSV A1 Viewer</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
     }
-    #excel-data {
+    #csv-data {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -26,32 +24,23 @@
   </style>
 </head>
 <body>
-  <div id="excel-data">Loading…</div>
+  <div id="csv-data">Loading…</div>
 
   <script>
-    // Fetch the Excel file as an ArrayBuffer
-    fetch('source/Data.xlsx')
+    fetch('source/Data.csv')
       .then(response => {
         if (!response.ok) throw new Error('Network response was not OK');
-        return response.arrayBuffer();
+        return response.text();
       })
-      .then(data => {
-        // Parse the workbook
-        const workbook = XLSX.read(data, { type: 'array' });
-        // Get the "Main" sheet
-        const sheet = workbook.Sheets['Main'];
-        if (!sheet) {
-          throw new Error('Sheet "Main" not found');
-        }
-        // Read cell A1
-        const cell = sheet['A1'];
-        const value = cell ? cell.v : '';
-        // Insert into the page
-        document.getElementById('excel-data').textContent = value;
+      .then(text => {
+        const lines = text.split(/\r?\n/); // Split into rows
+        const firstRow = lines[0];
+        const firstCell = firstRow ? firstRow.split(',')[0] : '';
+        document.getElementById('csv-data').textContent = firstCell;
       })
       .catch(err => {
         console.error(err);
-        document.getElementById('excel-data').textContent = 'Error loading data';
+        document.getElementById('csv-data').textContent = 'Error loading data';
       });
   </script>
 </body>
