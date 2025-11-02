@@ -415,7 +415,7 @@
             position: relative;
             width: 44px;
             height: 24px;
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+            background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
             border-radius: 12px;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -426,7 +426,7 @@
             content: '';
             position: absolute;
             top: 2px;
-            left: 2px;
+            left: 22px;
             width: 20px;
             height: 20px;
             background: white;
@@ -436,11 +436,11 @@
         }
         
         .dashboard-toggle.collapsed {
-            background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
         }
         
         .dashboard-toggle.collapsed::before {
-            transform: translateX(20px);
+            transform: translateX(-20px);
         }
         
         .dashboard-content {
@@ -614,10 +614,11 @@
             .dashboard-toggle::before {
                 width: 16px;
                 height: 16px;
+                left: 20px;
             }
             
             .dashboard-toggle.collapsed::before {
-                transform: translateX(18px);
+                transform: translateX(-18px);
             }
             
             .dashboard-stat {
@@ -714,10 +715,11 @@
             .dashboard-toggle::before {
                 width: 14px;
                 height: 14px;
+                left: 20px;
             }
             
             .dashboard-toggle.collapsed::before {
-                transform: translateX(18px);
+                transform: translateX(-18px);
             }
             
             /* Horizontal layout for dashboard stats */
