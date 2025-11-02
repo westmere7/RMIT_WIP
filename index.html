@@ -412,14 +412,35 @@
         }
         
         .dashboard-toggle {
-            font-size: 1.2em;
-            color: #E61E2A;
-            transition: transform 0.3s ease;
-            font-weight: bold;
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .dashboard-toggle::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         
         .dashboard-toggle.collapsed {
-            transform: rotate(-90deg);
+            background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
+        }
+        
+        .dashboard-toggle.collapsed::before {
+            transform: translateX(20px);
         }
         
         .dashboard-content {
@@ -583,6 +604,20 @@
                 font-size: 1em;
                 margin-bottom: 12px;
                 padding-bottom: 8px;
+            }
+            
+            .dashboard-toggle {
+                width: 38px;
+                height: 20px;
+            }
+            
+            .dashboard-toggle::before {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .dashboard-toggle.collapsed::before {
+                transform: translateX(18px);
             }
             
             .dashboard-stat {
@@ -813,7 +848,7 @@
                 <div id="dashboard" class="dashboard">
                     <div class="dashboard-title" onclick="toggleDashboard()">
                         <span>Overview</span>
-                        <span class="dashboard-toggle">?</span>
+                        <span class="dashboard-toggle" id="dashboardToggle"></span>
                     </div>
                     
                     <div class="dashboard-content" id="dashboardContent">
@@ -877,7 +912,7 @@
         
         function toggleDashboard() {
             const content = document.getElementById('dashboardContent');
-            const toggle = document.querySelector('.dashboard-toggle');
+            const toggle = document.getElementById('dashboardToggle');
             
             content.classList.toggle('collapsed');
             toggle.classList.toggle('collapsed');
