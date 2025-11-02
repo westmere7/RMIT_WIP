@@ -345,6 +345,105 @@
             opacity: 0.3;
         }
         
+        .main-wrapper {
+            display: flex;
+            gap: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .dashboard {
+            flex: 0 0 320px;
+            background: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .dashboard-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #E61E2A;
+        }
+        
+        .dashboard-stat {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #E61E2A;
+            transition: all 0.2s;
+        }
+        
+        .dashboard-stat:hover {
+            background: #f1f5f9;
+            transform: translateX(4px);
+        }
+        
+        .dashboard-stat-label {
+            font-size: 0.8em;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .dashboard-stat-value {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #E61E2A;
+            line-height: 1;
+        }
+        
+        .dashboard-status-group {
+            margin-bottom: 16px;
+        }
+        
+        .dashboard-status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .dashboard-status-item:hover {
+            background: #e2e8f0;
+        }
+        
+        .dashboard-status-label {
+            font-size: 0.85em;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .dashboard-status-count {
+            font-size: 1.3em;
+            font-weight: 800;
+            color: #2d3748;
+        }
+        
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .content-wrapper .content {
+            padding: 0;
+        }
+        
         .footer {
             background: #ffffff;
             padding: 16px 32px;
@@ -362,9 +461,24 @@
         }
         
         @media (max-width: 900px) {
+            .main-wrapper {
+                flex-direction: column;
+                padding: 16px;
+            }
+            
+            .dashboard {
+                flex: none;
+                width: 100%;
+                position: static;
+                order: -1;
+            }
+            
+            .content-wrapper .content {
+                padding: 0;
+            }
+            
             .content {
                 column-count: 1;
-                padding: 16px;
             }
             
             .header {
@@ -453,7 +567,31 @@
         
         <div id="loadingMessage" class="loading">Loading data...</div>
         <div id="errorMessage" class="error" style="display: none;"></div>
-        <div id="content" class="content" style="display: none;"></div>
+        
+        <div id="mainWrapper" class="main-wrapper" style="display: none;">
+            <div id="dashboard" class="dashboard">
+                <div class="dashboard-title">?? Overview</div>
+                
+                <div class="dashboard-stat">
+                    <div class="dashboard-stat-label">Total Tasks</div>
+                    <div class="dashboard-stat-value" id="totalTasks">0</div>
+                </div>
+                
+                <div class="dashboard-stat">
+                    <div class="dashboard-stat-label">Team Current Load</div>
+                    <div class="dashboard-stat-value" id="teamLoad">-</div>
+                </div>
+                
+                <div class="dashboard-status-group">
+                    <div class="dashboard-stat-label" style="margin-bottom: 12px;">Tasks by Status</div>
+                    <div id="statusBreakdown"></div>
+                </div>
+            </div>
+            
+            <div class="content-wrapper">
+                <div id="content" class="content"></div>
+            </div>
+        </div>
         
         <div class="footer" id="footer">
             Loading...
@@ -466,6 +604,7 @@
             pic: '',
             status: ''
         };
+        let teamLoad = '';
         
         async function loadCSV() {
             try {
@@ -491,10 +630,11 @@
 
         function processData(data) {
             try {
-                // Row 1 (index 0): Headers - A: Week info, B: Team name, C: Last updated
+                // Row 1 (index 0): Headers - A: Week info, B: Team name, C: Last updated, D: Team Load
                 const weekInfo = data[0][0] || 'Week';
                 const teamName = data[0][1] || 'Design Team';
                 const lastUpdated = data[0][2] || '';
+                teamLoad = data[0][3] || '-';
                 
                 // Update header
                 document.getElementById('teamName').textContent = teamName;
@@ -525,17 +665,85 @@
                 // Setup filter event listeners
                 setupFilters();
                 
+                // Populate dashboard
+                populateDashboard();
+                
                 // Render the content initially (grouped mode)
                 applyFiltersAndRender();
                 
                 // Show content and filters, hide loading
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('filters').style.display = 'block';
-                document.getElementById('content').style.display = 'block';
+                document.getElementById('mainWrapper').style.display = 'flex';
                 
             } catch (error) {
                 showError('Error processing data: ' + error.message);
             }
+        }
+        
+        function animateCount(element, start, end, duration) {
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    element.textContent = end;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 16);
+        }
+        
+        function populateDashboard() {
+            // Calculate statistics
+            const totalTasks = allTasks.length;
+            
+            // Count tasks by status
+            const statusCounts = {};
+            allTasks.forEach(task => {
+                if (task.status) {
+                    statusCounts[task.status] = (statusCounts[task.status] || 0) + 1;
+                }
+            });
+            
+            // Animate total tasks count
+            const totalTasksElement = document.getElementById('totalTasks');
+            animateCount(totalTasksElement, 0, totalTasks, 1000);
+            
+            // Set team load
+            document.getElementById('teamLoad').textContent = teamLoad;
+            
+            // Populate status breakdown
+            const statusBreakdownDiv = document.getElementById('statusBreakdown');
+            statusBreakdownDiv.innerHTML = '';
+            
+            // Sort statuses by count (descending)
+            const sortedStatuses = Object.entries(statusCounts).sort((a, b) => b[1] - a[1]);
+            
+            sortedStatuses.forEach(([status, count], index) => {
+                const statusItem = document.createElement('div');
+                statusItem.className = 'dashboard-status-item';
+                
+                const label = document.createElement('div');
+                label.className = 'dashboard-status-label';
+                label.textContent = status;
+                
+                const countElement = document.createElement('div');
+                countElement.className = 'dashboard-status-count';
+                countElement.textContent = '0';
+                
+                statusItem.appendChild(label);
+                statusItem.appendChild(countElement);
+                statusBreakdownDiv.appendChild(statusItem);
+                
+                // Animate count with staggered delay
+                setTimeout(() => {
+                    animateCount(countElement, 0, count, 800);
+                }, index * 100);
+            });
         }
         
         function populateFilters() {
