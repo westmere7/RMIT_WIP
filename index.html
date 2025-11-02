@@ -606,7 +606,7 @@
                 width: 100%;
             }
             
-            /* Ensure first row has name+logo, second row has selector */
+            /* Mobile grid layout: ensure first row has name+logo, second row has selector */
             @supports (display: grid) {
                 .header {
                     display: grid;
@@ -632,6 +632,7 @@
                     grid-column: 1 / -1;
                     grid-row: 2;
                     width: 100%;
+                    margin-left: 0;
                 }
             }
             
@@ -754,7 +755,7 @@
                 width: 100%;
             }
             
-            /* Ensure first row has name+logo, second row has selector */
+            /* Mobile grid layout: ensure first row has name+logo, second row has selector */
             @supports (display: grid) {
                 .header {
                     display: grid;
@@ -780,6 +781,7 @@
                     grid-column: 1 / -1;
                     grid-row: 2;
                     width: 100%;
+                    margin-left: 0;
                 }
             }
             
@@ -928,11 +930,11 @@
                     <h1 id="teamName">Design Team</h1>
                     <div class="date" id="headerDate">Loading...</div>
                 </div>
+                <select id="weekSelector" class="week-selector" style="display: none;">
+                    <option value="">Select Week</option>
+                </select>
             </div>
             <img src="data/RMIT_logo_white.svg" alt="RMIT Logo" class="header-logo">
-            <select id="weekSelector" class="week-selector" style="display: none;">
-                <option value="">Select Week</option>
-            </select>
         </div>
         
         <div id="loadingMessage" class="loading">Loading data...</div>
@@ -1017,14 +1019,9 @@
                         { file: 'W46_2025.xlsx', week: 46, year: 2025 }
                     ];
                 }
-                // Skip auto-discovery if manifest has files (for faster loading)
-                // To force auto-discovery, delete weeks.json or run generate_weeks_list.py
-                if (AVAILABLE_WEEKS.length === 0) {
-                    console.log('No weeks in manifest, attempting auto-discovery...');
-                    await autoDiscoverWeeks();
-                } else {
-                    console.log('Using manifest (faster). To add new weeks, run: python3 generate_weeks_list.py');
-                }
+                // Always run auto-discovery to find new files automatically
+                // This ensures newly added files appear without manual intervention
+                await autoDiscoverWeeks();
             } catch (error) {
                 console.error('Error loading weeks manifest:', error);
                 // Use fallback
@@ -1036,12 +1033,18 @@
         }
         
         // Try to auto-discover week files matching WXX_YYYY.xlsx pattern
+        // Optimized: only checks files not already in manifest
         async function autoDiscoverWeeks() {
             const knownFiles = new Set(AVAILABLE_WEEKS.map(w => w.file));
             const testFiles = [];
             
-            // Test week numbers 1-99 for years 2024-2030
-            for (let year = 2024; year <= 2030; year++) {
+            // Only test reasonable year range centered on current year
+            const currentYear = new Date().getFullYear();
+            const startYear = currentYear - 1; // Previous year
+            const endYear = currentYear + 5;   // 5 years ahead
+            
+            // Test week numbers 1-99
+            for (let year = startYear; year <= endYear; year++) {
                 for (let week = 1; week <= 99; week++) {
                     const weekStr = week.toString().padStart(2, '0');
                     const filename = `W${weekStr}_${year}.xlsx`;
@@ -1051,9 +1054,11 @@
                 }
             }
             
+            console.log(`Checking ${testFiles.length} potential new files...`);
+            
             // Test if files exist by attempting to fetch headers
-            // Test in batches to avoid too many concurrent requests
-            const batchSize = 50;
+            // Use smaller batch size for faster response
+            const batchSize = 20;
             let discovered = 0;
             
             for (let i = 0; i < testFiles.length; i += batchSize) {
@@ -1082,7 +1087,9 @@
             }
             
             if (discovered > 0) {
-                console.log(`Auto-discovered ${discovered} additional weekly reports`);
+                console.log(`? Auto-discovered ${discovered} new weekly reports`);
+            } else {
+                console.log('? No new files found');
             }
             
             // Sort by most recent first (descending year, then descending week)
