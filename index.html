@@ -242,9 +242,11 @@
         
         .filters {
             background: #ffffff;
-            padding: 14px 24px;
-            border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            padding: 14px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
         
         .filters-container {
@@ -252,8 +254,6 @@
             gap: 12px;
             flex-wrap: wrap;
             align-items: center;
-            max-width: 1600px;
-            margin: 0 auto;
         }
         
         .filter-group {
@@ -438,10 +438,20 @@
         .content-wrapper {
             flex: 1;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
         }
         
         .content-wrapper .content {
             padding: 0;
+        }
+        
+        .content-wrapper .filters {
+            order: 1;
+        }
+        
+        .content-wrapper #content {
+            order: 2;
         }
         
         .footer {
@@ -470,7 +480,12 @@
                 flex: none;
                 width: 100%;
                 position: static;
-                order: -1;
+                order: 1;
+                margin-bottom: 20px;
+            }
+            
+            .content-wrapper {
+                order: 2;
             }
             
             .content-wrapper .content {
@@ -545,26 +560,6 @@
             <img src="data/RMIT_logo_white.svg" alt="RMIT Logo" class="header-logo">
         </div>
         
-        <div id="filters" class="filters" style="display: none;">
-            <div class="filters-container">
-                <div class="filter-group">
-                    <label class="filter-label">Person in Charge</label>
-                    <select id="picFilter" class="filter-select">
-                        <option value="">All People</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Status</label>
-                    <select id="statusFilter" class="filter-select">
-                        <option value="">All Statuses</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <button id="clearFilters" class="clear-filters" disabled>Clear Filters</button>
-                </div>
-            </div>
-        </div>
-        
         <div id="loadingMessage" class="loading">Loading data...</div>
         <div id="errorMessage" class="error" style="display: none;"></div>
         
@@ -589,6 +584,26 @@
             </div>
             
             <div class="content-wrapper">
+                <div id="filters" class="filters" style="display: none;">
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label class="filter-label">Person in Charge</label>
+                            <select id="picFilter" class="filter-select">
+                                <option value="">All People</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Status</label>
+                            <select id="statusFilter" class="filter-select">
+                                <option value="">All Statuses</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <button id="clearFilters" class="clear-filters" disabled>Clear Filters</button>
+                        </div>
+                    </div>
+                </div>
+                
                 <div id="content" class="content"></div>
             </div>
         </div>
