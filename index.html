@@ -1038,10 +1038,9 @@
             const knownFiles = new Set(AVAILABLE_WEEKS.map(w => w.file));
             const testFiles = [];
             
-            // Only test reasonable year range centered on current year
-            const currentYear = new Date().getFullYear();
-            const startYear = currentYear - 1; // Previous year
-            const endYear = currentYear + 5;   // 5 years ahead
+            // Only check 2025 for now (can be expanded if needed)
+            const startYear = 2025;
+            const endYear = 2025;
             
             // Test week numbers 1-99
             for (let year = startYear; year <= endYear; year++) {
