@@ -399,6 +399,38 @@
             padding-bottom: 12px;
             border-bottom: 3px solid #E61E2A;
             border-radius: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        
+        .dashboard-title:hover {
+            color: #E61E2A;
+        }
+        
+        .dashboard-toggle {
+            font-size: 1.2em;
+            color: #E61E2A;
+            transition: transform 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .dashboard-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+        
+        .dashboard-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .dashboard-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: -20px;
         }
         
         .dashboard-stat {
@@ -779,21 +811,26 @@
         <div id="mainWrapper" class="main-wrapper" style="display: none;">
             <div class="sidebar">
                 <div id="dashboard" class="dashboard">
-                    <div class="dashboard-title">Overview</div>
-                    
-                    <div class="dashboard-stat">
-                        <div class="dashboard-stat-label">Total Tasks</div>
-                        <div class="dashboard-stat-value" id="totalTasks">0</div>
+                    <div class="dashboard-title" onclick="toggleDashboard()">
+                        <span>Overview</span>
+                        <span class="dashboard-toggle">?</span>
                     </div>
                     
-                    <div class="dashboard-stat">
-                        <div class="dashboard-stat-label">Team Current Load</div>
-                        <div class="dashboard-stat-value" id="teamLoad">-</div>
-                    </div>
-                    
-                    <div class="dashboard-status-group">
-                        <div class="dashboard-stat-label" style="margin-bottom: 12px;">Tasks by Status</div>
-                        <div id="statusBreakdown"></div>
+                    <div class="dashboard-content" id="dashboardContent">
+                        <div class="dashboard-stat">
+                            <div class="dashboard-stat-label">Total Tasks</div>
+                            <div class="dashboard-stat-value" id="totalTasks">0</div>
+                        </div>
+                        
+                        <div class="dashboard-stat">
+                            <div class="dashboard-stat-label">Team Current Load</div>
+                            <div class="dashboard-stat-value" id="teamLoad">-</div>
+                        </div>
+                        
+                        <div class="dashboard-status-group">
+                            <div class="dashboard-stat-label" style="margin-bottom: 12px;">Tasks by Status</div>
+                            <div id="statusBreakdown"></div>
+                        </div>
                     </div>
                 </div>
                 
@@ -837,6 +874,14 @@
             status: ''
         };
         let teamLoad = '';
+        
+        function toggleDashboard() {
+            const content = document.getElementById('dashboardContent');
+            const toggle = document.querySelector('.dashboard-toggle');
+            
+            content.classList.toggle('collapsed');
+            toggle.classList.toggle('collapsed');
+        }
         
         async function loadCSV() {
             try {
