@@ -301,12 +301,16 @@
     <script>
         async function loadCSV() {
             try {
-                const response = await fetch('data/wip.xlsx');
+                // Add cache busting to ensure fresh file metadata
+                const cacheBuster = '?t=' + new Date().getTime();
+                const response = await fetch('data/wip.xlsx' + cacheBuster, {
+                    cache: 'no-store'
+                });
                 if (!response.ok) {
                     throw new Error(`Failed to load Excel file: ${response.statusText}`);
                 }
                 
-                // Get last modified date from response headers
+                // Try to get last modified date from response headers
                 const lastModified = response.headers.get('Last-Modified');
                 let lastModifiedDate = null;
                 if (lastModified) {
@@ -314,6 +318,31 @@
                 }
                 
                 const arrayBuffer = await response.arrayBuffer();
+                
+                // If we couldn't get Last-Modified from headers, try to get file stats via API
+                if (!lastModifiedDate) {
+                    try {
+                        // Try both PHP and Python endpoints
+                        let statsResponse = await fetch('file-stats?file=data/wip.xlsx', {
+                            cache: 'no-store'
+                        });
+                        if (!statsResponse.ok) {
+                            statsResponse = await fetch('file-stats.php?file=data/wip.xlsx', {
+                                cache: 'no-store'
+                            });
+                        }
+                        if (statsResponse.ok) {
+                            const stats = await statsResponse.json();
+                            if (stats.lastModified) {
+                                lastModifiedDate = new Date(stats.lastModified * 1000);
+                            }
+                        }
+                    } catch (e) {
+                        // Fallback: use current time as indication
+                        console.log('Could not get file stats:', e);
+                    }
+                }
+                
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
                 
                 // Get the first sheet
