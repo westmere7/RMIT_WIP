@@ -63,11 +63,9 @@
         
         .content {
             padding: 24px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-            gap: 20px;
-            grid-auto-flow: dense;
-            align-items: start;
+            column-count: auto;
+            column-width: 480px;
+            column-gap: 20px;
         }
         
         .project-section {
@@ -77,6 +75,8 @@
             padding: 0;
             border: 1px solid rgba(148, 163, 184, 0.1);
             overflow: hidden;
+            break-inside: avoid;
+            margin-bottom: 20px;
         }
         
         .project-section h2 {
@@ -217,13 +217,13 @@
         
         @media (max-width: 1400px) {
             .content {
-                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+                column-width: 400px;
             }
         }
         
         @media (max-width: 900px) {
             .content {
-                grid-template-columns: 1fr;
+                column-count: 1;
                 padding: 16px;
             }
             
@@ -341,7 +341,7 @@
                 
                 // Show content, hide loading
                 document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('content').style.display = 'grid';
+                document.getElementById('content').style.display = 'block';
                 
             } catch (error) {
                 showError('Error processing data: ' + error.message);
