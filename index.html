@@ -565,18 +565,20 @@
             
             .header {
                 padding: 12px 16px;
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
                 gap: 10px;
                 text-align: left;
+                align-items: flex-start;
             }
             
             .header-left {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
+                flex-direction: column;
+                align-items: stretch;
                 gap: 10px;
-                width: 100%;
+                flex: 1;
                 order: 1;
+                min-width: 0;
             }
             
             .header-content {
@@ -588,6 +590,7 @@
                 flex-shrink: 0;
                 height: 32px;
                 order: 2;
+                align-self: flex-start;
             }
             
             .week-selector {
@@ -595,7 +598,6 @@
                 margin-left: 0;
                 font-size: 0.85em;
                 padding: 8px 12px;
-                order: 3;
             }
             
             .header h1 {
@@ -604,11 +606,6 @@
             
             .header .date {
                 font-size: 0.8em;
-            }
-            
-            .header-logo {
-                height: 32px;
-                order: 2;
             }
             
             .dashboard {
@@ -683,16 +680,18 @@
             .header {
                 padding: 12px 14px;
                 gap: 8px;
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: flex-start;
             }
             
             .header-left {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
+                flex-direction: column;
+                align-items: stretch;
                 gap: 8px;
-                width: 100%;
+                flex: 1;
                 order: 1;
+                min-width: 0;
             }
             
             .header-content {
@@ -704,6 +703,7 @@
                 flex-shrink: 0;
                 height: 32px;
                 order: 2;
+                align-self: flex-start;
             }
             
             .week-selector {
@@ -711,7 +711,6 @@
                 margin-left: 0;
                 font-size: 0.8em;
                 padding: 8px 10px;
-                order: 3;
             }
             
             .header h1 {
@@ -720,10 +719,6 @@
             
             .header .date {
                 font-size: 0.8em;
-            }
-            
-            .header-logo {
-                height: 32px;
             }
             
             .dashboard {
