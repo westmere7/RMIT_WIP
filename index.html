@@ -79,6 +79,26 @@
             column-count: auto;
             column-width: 480px;
             column-gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .content.individual-mode {
+            column-count: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .content.individual-mode .task-card {
+            margin-bottom: 16px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .content.individual-mode .task-card:hover {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+            transform: translateY(-1px);
         }
         
         .project-section {
@@ -220,6 +240,215 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
         
+        .filters {
+            background: #ffffff;
+            padding: 14px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .filters-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 180px;
+        }
+        
+        .filter-label {
+            font-size: 0.75em;
+            font-weight: 600;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.85em;
+            background: #fafafa;
+            color: #2d3748;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-select:hover {
+            border-color: #E61E2A;
+            background: white;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #E61E2A;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(230, 30, 42, 0.1);
+        }
+        
+        .clear-filters {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 16px;
+        }
+        
+        .clear-filters:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 30, 42, 0.3);
+        }
+        
+        .clear-filters:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .task-campaign {
+            color: #E61E2A;
+            font-size: 0.75em;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+            font-size: 1.1em;
+            background: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        
+        .no-results-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .main-wrapper {
+            display: flex;
+            gap: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .sidebar {
+            flex: 0 0 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: sticky;
+            top: 24px;
+            height: fit-content;
+        }
+        
+        .dashboard {
+            background: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .dashboard-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #E61E2A;
+        }
+        
+        .dashboard-stat {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #E61E2A;
+            transition: all 0.2s;
+        }
+        
+        .dashboard-stat:hover {
+            background: #f1f5f9;
+            transform: translateX(4px);
+        }
+        
+        .dashboard-stat-label {
+            font-size: 0.8em;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .dashboard-stat-value {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #E61E2A;
+            line-height: 1;
+        }
+        
+        .dashboard-status-group {
+            margin-bottom: 16px;
+        }
+        
+        .dashboard-status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .dashboard-status-item:hover {
+            background: #e2e8f0;
+        }
+        
+        .dashboard-status-label {
+            font-size: 0.85em;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .dashboard-status-count {
+            font-size: 1.3em;
+            font-weight: 800;
+            color: #2d3748;
+        }
+        
+        .content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .content-wrapper .content {
+            padding: 0;
+        }
+        
         .footer {
             background: #ffffff;
             padding: 16px 32px;
@@ -237,9 +466,29 @@
         }
         
         @media (max-width: 900px) {
+            .main-wrapper {
+                flex-direction: column;
+                padding: 16px;
+            }
+            
+            .sidebar {
+                flex: none;
+                width: 100%;
+                position: static;
+                order: 1;
+                gap: 16px;
+            }
+            
+            .content-wrapper {
+                order: 2;
+            }
+            
+            .content-wrapper .content {
+                padding: 0;
+            }
+            
             .content {
                 column-count: 1;
-                padding: 16px;
             }
             
             .header {
@@ -267,6 +516,23 @@
                 font-size: 12px;
             }
             
+            .filters {
+                padding: 16px;
+            }
+            
+            .filters-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+            
+            .clear-filters {
+                width: 100%;
+            }
+            
             .task-card {
                 flex-direction: column;
                 align-items: flex-start;
@@ -291,7 +557,53 @@
         
         <div id="loadingMessage" class="loading">Loading data...</div>
         <div id="errorMessage" class="error" style="display: none;"></div>
-        <div id="content" class="content" style="display: none;"></div>
+        
+        <div id="mainWrapper" class="main-wrapper" style="display: none;">
+            <div class="sidebar">
+                <div id="dashboard" class="dashboard">
+                    <div class="dashboard-title">?? Overview</div>
+                    
+                    <div class="dashboard-stat">
+                        <div class="dashboard-stat-label">Total Tasks</div>
+                        <div class="dashboard-stat-value" id="totalTasks">0</div>
+                    </div>
+                    
+                    <div class="dashboard-stat">
+                        <div class="dashboard-stat-label">Team Current Load</div>
+                        <div class="dashboard-stat-value" id="teamLoad">-</div>
+                    </div>
+                    
+                    <div class="dashboard-status-group">
+                        <div class="dashboard-stat-label" style="margin-bottom: 12px;">Tasks by Status</div>
+                        <div id="statusBreakdown"></div>
+                    </div>
+                </div>
+                
+                <div id="filters" class="filters" style="display: none;">
+                    <div class="filters-container">
+                        <div class="filter-group">
+                            <label class="filter-label">Person in Charge</label>
+                            <select id="picFilter" class="filter-select">
+                                <option value="">All People</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Status</label>
+                            <select id="statusFilter" class="filter-select">
+                                <option value="">All Statuses</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <button id="clearFilters" class="clear-filters" disabled>Clear Filters</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-wrapper">
+                <div id="content" class="content"></div>
+            </div>
+        </div>
         
         <div class="footer" id="footer">
             Loading...
@@ -299,6 +611,13 @@
     </div>
 
     <script>
+        let allTasks = [];
+        let currentFilters = {
+            pic: '',
+            status: ''
+        };
+        let teamLoad = '';
+        
         async function loadCSV() {
             try {
                 const response = await fetch('data/wip.xlsx');
@@ -323,10 +642,11 @@
 
         function processData(data) {
             try {
-                // Row 1 (index 0): Headers - A: Week info, B: Team name, C: Last updated
+                // Row 1 (index 0): Headers - A: Week info, B: Team name, C: Last updated, D: Team Load
                 const weekInfo = data[0][0] || 'Week';
                 const teamName = data[0][1] || 'Design Team';
                 const lastUpdated = data[0][2] || '';
+                teamLoad = data[0][3] || '-';
                 
                 // Update header
                 document.getElementById('teamName').textContent = teamName;
@@ -337,11 +657,11 @@
                 
                 // Rows 3+ (index 2+): Data rows
                 // Columns: A: Campaign (group), B: Task, C: PIC, D: Status, E: Details
-                const tasks = [];
+                allTasks = [];
                 for (let i = 2; i < data.length; i++) {
                     const row = data[i];
                     if (row[0] || row[1]) { // Has campaign or task
-                        tasks.push({
+                        allTasks.push({
                             campaign: (row[0] || '').trim(),
                             task: (row[1] || '').trim(),
                             pic: (row[2] || '').trim(),
@@ -351,9 +671,173 @@
                     }
                 }
                 
-                // Group tasks by campaign
+                // Populate filter dropdowns
+                populateFilters();
+                
+                // Setup filter event listeners
+                setupFilters();
+                
+                // Populate dashboard
+                populateDashboard();
+                
+                // Render the content initially (grouped mode)
+                applyFiltersAndRender();
+                
+                // Show content and filters, hide loading
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('filters').style.display = 'block';
+                document.getElementById('mainWrapper').style.display = 'flex';
+                
+            } catch (error) {
+                showError('Error processing data: ' + error.message);
+            }
+        }
+        
+        function animateCount(element, start, end, duration) {
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    element.textContent = end;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 16);
+        }
+        
+        function populateDashboard() {
+            // Calculate statistics
+            const totalTasks = allTasks.length;
+            
+            // Count tasks by status
+            const statusCounts = {};
+            allTasks.forEach(task => {
+                if (task.status) {
+                    statusCounts[task.status] = (statusCounts[task.status] || 0) + 1;
+                }
+            });
+            
+            // Animate total tasks count
+            const totalTasksElement = document.getElementById('totalTasks');
+            animateCount(totalTasksElement, 0, totalTasks, 1000);
+            
+            // Set team load
+            document.getElementById('teamLoad').textContent = teamLoad;
+            
+            // Populate status breakdown
+            const statusBreakdownDiv = document.getElementById('statusBreakdown');
+            statusBreakdownDiv.innerHTML = '';
+            
+            // Sort statuses by count (descending)
+            const sortedStatuses = Object.entries(statusCounts).sort((a, b) => b[1] - a[1]);
+            
+            sortedStatuses.forEach(([status, count], index) => {
+                const statusItem = document.createElement('div');
+                statusItem.className = 'dashboard-status-item';
+                
+                const label = document.createElement('div');
+                label.className = 'dashboard-status-label';
+                label.textContent = status;
+                
+                const countElement = document.createElement('div');
+                countElement.className = 'dashboard-status-count';
+                countElement.textContent = '0';
+                
+                statusItem.appendChild(label);
+                statusItem.appendChild(countElement);
+                statusBreakdownDiv.appendChild(statusItem);
+                
+                // Animate count with staggered delay
+                setTimeout(() => {
+                    animateCount(countElement, 0, count, 800);
+                }, index * 100);
+            });
+        }
+        
+        function populateFilters() {
+            // Get unique PICs and statuses
+            const pics = [...new Set(allTasks.map(t => t.pic).filter(p => p))].sort();
+            const statuses = [...new Set(allTasks.map(t => t.status).filter(s => s))].sort();
+            
+            const picFilter = document.getElementById('picFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            
+            // Populate PIC filter
+            pics.forEach(pic => {
+                const option = document.createElement('option');
+                option.value = pic;
+                option.textContent = pic;
+                picFilter.appendChild(option);
+            });
+            
+            // Populate status filter
+            statuses.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status;
+                option.textContent = status;
+                statusFilter.appendChild(option);
+            });
+        }
+        
+        function setupFilters() {
+            const picFilter = document.getElementById('picFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const clearButton = document.getElementById('clearFilters');
+            
+            picFilter.addEventListener('change', () => {
+                currentFilters.pic = picFilter.value;
+                updateClearButton();
+                applyFiltersAndRender();
+            });
+            
+            statusFilter.addEventListener('change', () => {
+                currentFilters.status = statusFilter.value;
+                updateClearButton();
+                applyFiltersAndRender();
+            });
+            
+            clearButton.addEventListener('click', () => {
+                currentFilters.pic = '';
+                currentFilters.status = '';
+                picFilter.value = '';
+                statusFilter.value = '';
+                updateClearButton();
+                applyFiltersAndRender();
+            });
+        }
+        
+        function updateClearButton() {
+            const clearButton = document.getElementById('clearFilters');
+            const hasFilters = currentFilters.pic || currentFilters.status;
+            clearButton.disabled = !hasFilters;
+        }
+        
+        function applyFiltersAndRender() {
+            // Filter tasks based on current filters
+            let filteredTasks = allTasks;
+            
+            if (currentFilters.pic) {
+                filteredTasks = filteredTasks.filter(t => t.pic === currentFilters.pic);
+            }
+            
+            if (currentFilters.status) {
+                filteredTasks = filteredTasks.filter(t => t.status === currentFilters.status);
+            }
+            
+            // Determine if we should use individual card mode
+            const hasFilters = currentFilters.pic || currentFilters.status;
+            
+            if (hasFilters) {
+                // Individual card mode
+                renderIndividualCards(filteredTasks);
+            } else {
+                // Grouped mode
                 const groupedTasks = {};
-                tasks.forEach(task => {
+                filteredTasks.forEach(task => {
                     if (task.campaign) {
                         if (!groupedTasks[task.campaign]) {
                             groupedTasks[task.campaign] = [];
@@ -361,22 +845,77 @@
                         groupedTasks[task.campaign].push(task);
                     }
                 });
-                
-                // Render the content
                 renderContent(groupedTasks);
-                
-                // Show content, hide loading
-                document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                
-            } catch (error) {
-                showError('Error processing data: ' + error.message);
             }
         }
 
+        function renderIndividualCards(tasks) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = '';
+            contentDiv.classList.add('individual-mode');
+            
+            if (tasks.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.innerHTML = '<div class="no-results-icon">??</div><div>No tasks found</div>';
+                contentDiv.appendChild(noResults);
+                return;
+            }
+            
+            tasks.forEach(task => {
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                
+                const taskLeft = document.createElement('div');
+                taskLeft.className = 'task-left';
+                
+                // Add campaign name as first line
+                if (task.campaign) {
+                    const taskCampaign = document.createElement('div');
+                    taskCampaign.className = 'task-campaign';
+                    taskCampaign.textContent = task.campaign;
+                    taskLeft.appendChild(taskCampaign);
+                }
+                
+                const taskTitle = document.createElement('div');
+                taskTitle.className = 'task-title';
+                taskTitle.textContent = task.task;
+                taskLeft.appendChild(taskTitle);
+                
+                if (task.details) {
+                    const taskDetails = document.createElement('div');
+                    taskDetails.className = 'task-details';
+                    taskDetails.textContent = task.details;
+                    taskLeft.appendChild(taskDetails);
+                }
+                
+                const taskRight = document.createElement('div');
+                taskRight.className = 'task-right';
+                
+                if (task.status) {
+                    const statusBadge = document.createElement('span');
+                    statusBadge.className = 'status-badge ' + getStatusClass(task.status);
+                    statusBadge.textContent = task.status;
+                    taskRight.appendChild(statusBadge);
+                }
+                
+                if (task.pic) {
+                    const assignee = document.createElement('span');
+                    assignee.className = 'assignee';
+                    assignee.textContent = task.pic;
+                    taskRight.appendChild(assignee);
+                }
+                
+                taskCard.appendChild(taskLeft);
+                taskCard.appendChild(taskRight);
+                contentDiv.appendChild(taskCard);
+            });
+        }
+        
         function renderContent(groupedTasks) {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = '';
+            contentDiv.classList.remove('individual-mode');
             
             Object.keys(groupedTasks).forEach(campaign => {
                 const section = document.createElement('div');
