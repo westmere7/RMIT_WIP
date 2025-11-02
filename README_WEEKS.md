@@ -55,8 +55,11 @@ Each row contains one task with the corresponding information.
 
 ## How It Works
 
-1. **Automatic Discovery**: The system checks for files named `W{week}_{year}.xlsx` in weeks 30-52 of 2025
-2. **Manifest Loading**: Loads from `data/weeks.json` if available
+1. **Automatic Discovery**: The system checks for files named `WXX_YYYY.xlsx` for:
+   - Weeks 01-99
+   - Years 2024-2026
+   - Files are checked in batches of 50 to avoid overwhelming the server
+2. **Manifest Loading**: Loads from `data/weeks.json` if available (faster)
 3. **Fallback**: Uses default W45 and W46 if nothing else is found
 
 ## Status Types
@@ -81,10 +84,12 @@ The following status badges are supported:
 **Q: The auto-discovery is slow**
 - Run `python3 generate_weeks_list.py` to create a manifest file
 - This makes loading instant instead of checking for each week
+- Auto-discovery checks up to 297 possible files (99 weeks ? 3 years)
 
-**Q: I need weeks from a different year**
-- Edit the year range in `index.html` around line 942
-- Or simply add files and run the generator script
+**Q: I need weeks from years other than 2024-2026**
+- Edit the year range in `index.html` around line 944
+- Change `for (let year = 2024; year <= 2026; year++)` to your desired range
+- Or simply add files and run the generator script (works for any year)
 
 ## Need Help?
 
