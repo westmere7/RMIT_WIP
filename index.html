@@ -706,6 +706,20 @@
                 padding-bottom: 6px;
             }
             
+            .dashboard-toggle {
+                width: 36px;
+                height: 18px;
+            }
+            
+            .dashboard-toggle::before {
+                width: 14px;
+                height: 14px;
+            }
+            
+            .dashboard-toggle.collapsed::before {
+                transform: translateX(18px);
+            }
+            
             /* Horizontal layout for dashboard stats */
             .dashboard-stat {
                 margin-bottom: 0;
