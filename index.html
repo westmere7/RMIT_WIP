@@ -412,6 +412,12 @@
             color: #E61E2A;
         }
         
+        .dashboard-title.collapsed {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
         .dashboard-toggle {
             position: relative;
             width: 44px;
@@ -930,9 +936,11 @@
         function toggleDashboard() {
             const content = document.getElementById('dashboardContent');
             const toggle = document.getElementById('dashboardToggle');
+            const title = document.querySelector('.dashboard-title');
             
             content.classList.toggle('collapsed');
             toggle.classList.toggle('collapsed');
+            title.classList.toggle('collapsed');
         }
         
         async function loadCSV() {
