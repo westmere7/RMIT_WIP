@@ -81,6 +81,16 @@
             column-gap: 20px;
         }
         
+        .content.individual-mode {
+            column-count: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .content.individual-mode .task-card {
+            margin-bottom: 12px;
+        }
+        
         .project-section {
             background: #ffffff;
             backdrop-filter: blur(10px);
@@ -220,6 +230,91 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
         
+        .filters {
+            background: #ffffff;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        
+        .filters-container {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 200px;
+        }
+        
+        .filter-label {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filter-select {
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.9em;
+            background: #fafafa;
+            color: #2d3748;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-select:hover {
+            border-color: #E61E2A;
+            background: white;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #E61E2A;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(230, 30, 42, 0.1);
+        }
+        
+        .clear-filters {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 18px;
+        }
+        
+        .clear-filters:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 30, 42, 0.3);
+        }
+        
+        .clear-filters:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .task-campaign {
+            color: #E61E2A;
+            font-size: 0.75em;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
         .footer {
             background: #ffffff;
             padding: 16px 32px;
@@ -267,6 +362,23 @@
                 font-size: 12px;
             }
             
+            .filters {
+                padding: 16px;
+            }
+            
+            .filters-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+            
+            .clear-filters {
+                width: 100%;
+            }
+            
             .task-card {
                 flex-direction: column;
                 align-items: flex-start;
@@ -289,6 +401,26 @@
             <img src="data/RMIT_logo_white.svg" alt="RMIT Logo" class="header-logo">
         </div>
         
+        <div id="filters" class="filters" style="display: none;">
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label class="filter-label">Person in Charge</label>
+                    <select id="picFilter" class="filter-select">
+                        <option value="">All People</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Statuses</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button id="clearFilters" class="clear-filters" disabled>Clear Filters</button>
+                </div>
+            </div>
+        </div>
+        
         <div id="loadingMessage" class="loading">Loading data...</div>
         <div id="errorMessage" class="error" style="display: none;"></div>
         <div id="content" class="content" style="display: none;"></div>
@@ -299,6 +431,12 @@
     </div>
 
     <script>
+        let allTasks = [];
+        let currentFilters = {
+            pic: '',
+            status: ''
+        };
+        
         async function loadCSV() {
             try {
                 const response = await fetch('data/wip.xlsx');
@@ -337,11 +475,11 @@
                 
                 // Rows 3+ (index 2+): Data rows
                 // Columns: A: Campaign (group), B: Task, C: PIC, D: Status, E: Details
-                const tasks = [];
+                allTasks = [];
                 for (let i = 2; i < data.length; i++) {
                     const row = data[i];
                     if (row[0] || row[1]) { // Has campaign or task
-                        tasks.push({
+                        allTasks.push({
                             campaign: (row[0] || '').trim(),
                             task: (row[1] || '').trim(),
                             pic: (row[2] || '').trim(),
@@ -351,9 +489,105 @@
                     }
                 }
                 
-                // Group tasks by campaign
+                // Populate filter dropdowns
+                populateFilters();
+                
+                // Setup filter event listeners
+                setupFilters();
+                
+                // Render the content initially (grouped mode)
+                applyFiltersAndRender();
+                
+                // Show content and filters, hide loading
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('filters').style.display = 'block';
+                document.getElementById('content').style.display = 'block';
+                
+            } catch (error) {
+                showError('Error processing data: ' + error.message);
+            }
+        }
+        
+        function populateFilters() {
+            // Get unique PICs and statuses
+            const pics = [...new Set(allTasks.map(t => t.pic).filter(p => p))].sort();
+            const statuses = [...new Set(allTasks.map(t => t.status).filter(s => s))].sort();
+            
+            const picFilter = document.getElementById('picFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            
+            // Populate PIC filter
+            pics.forEach(pic => {
+                const option = document.createElement('option');
+                option.value = pic;
+                option.textContent = pic;
+                picFilter.appendChild(option);
+            });
+            
+            // Populate status filter
+            statuses.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status;
+                option.textContent = status;
+                statusFilter.appendChild(option);
+            });
+        }
+        
+        function setupFilters() {
+            const picFilter = document.getElementById('picFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const clearButton = document.getElementById('clearFilters');
+            
+            picFilter.addEventListener('change', () => {
+                currentFilters.pic = picFilter.value;
+                updateClearButton();
+                applyFiltersAndRender();
+            });
+            
+            statusFilter.addEventListener('change', () => {
+                currentFilters.status = statusFilter.value;
+                updateClearButton();
+                applyFiltersAndRender();
+            });
+            
+            clearButton.addEventListener('click', () => {
+                currentFilters.pic = '';
+                currentFilters.status = '';
+                picFilter.value = '';
+                statusFilter.value = '';
+                updateClearButton();
+                applyFiltersAndRender();
+            });
+        }
+        
+        function updateClearButton() {
+            const clearButton = document.getElementById('clearFilters');
+            const hasFilters = currentFilters.pic || currentFilters.status;
+            clearButton.disabled = !hasFilters;
+        }
+        
+        function applyFiltersAndRender() {
+            // Filter tasks based on current filters
+            let filteredTasks = allTasks;
+            
+            if (currentFilters.pic) {
+                filteredTasks = filteredTasks.filter(t => t.pic === currentFilters.pic);
+            }
+            
+            if (currentFilters.status) {
+                filteredTasks = filteredTasks.filter(t => t.status === currentFilters.status);
+            }
+            
+            // Determine if we should use individual card mode
+            const hasFilters = currentFilters.pic || currentFilters.status;
+            
+            if (hasFilters) {
+                // Individual card mode
+                renderIndividualCards(filteredTasks);
+            } else {
+                // Grouped mode
                 const groupedTasks = {};
-                tasks.forEach(task => {
+                filteredTasks.forEach(task => {
                     if (task.campaign) {
                         if (!groupedTasks[task.campaign]) {
                             groupedTasks[task.campaign] = [];
@@ -361,22 +595,69 @@
                         groupedTasks[task.campaign].push(task);
                     }
                 });
-                
-                // Render the content
                 renderContent(groupedTasks);
-                
-                // Show content, hide loading
-                document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                
-            } catch (error) {
-                showError('Error processing data: ' + error.message);
             }
         }
 
+        function renderIndividualCards(tasks) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = '';
+            contentDiv.classList.add('individual-mode');
+            
+            tasks.forEach(task => {
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                
+                const taskLeft = document.createElement('div');
+                taskLeft.className = 'task-left';
+                
+                // Add campaign name as first line
+                if (task.campaign) {
+                    const taskCampaign = document.createElement('div');
+                    taskCampaign.className = 'task-campaign';
+                    taskCampaign.textContent = task.campaign;
+                    taskLeft.appendChild(taskCampaign);
+                }
+                
+                const taskTitle = document.createElement('div');
+                taskTitle.className = 'task-title';
+                taskTitle.textContent = task.task;
+                taskLeft.appendChild(taskTitle);
+                
+                if (task.details) {
+                    const taskDetails = document.createElement('div');
+                    taskDetails.className = 'task-details';
+                    taskDetails.textContent = task.details;
+                    taskLeft.appendChild(taskDetails);
+                }
+                
+                const taskRight = document.createElement('div');
+                taskRight.className = 'task-right';
+                
+                if (task.status) {
+                    const statusBadge = document.createElement('span');
+                    statusBadge.className = 'status-badge ' + getStatusClass(task.status);
+                    statusBadge.textContent = task.status;
+                    taskRight.appendChild(statusBadge);
+                }
+                
+                if (task.pic) {
+                    const assignee = document.createElement('span');
+                    assignee.className = 'assignee';
+                    assignee.textContent = task.pic;
+                    taskRight.appendChild(assignee);
+                }
+                
+                taskCard.appendChild(taskLeft);
+                taskCard.appendChild(taskRight);
+                contentDiv.appendChild(taskCard);
+            });
+        }
+        
         function renderContent(groupedTasks) {
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = '';
+            contentDiv.classList.remove('individual-mode');
             
             Object.keys(groupedTasks).forEach(campaign => {
                 const section = document.createElement('div');
