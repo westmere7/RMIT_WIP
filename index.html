@@ -964,8 +964,8 @@
             const knownFiles = new Set(AVAILABLE_WEEKS.map(w => w.file));
             const testFiles = [];
             
-            // Test week numbers 1-99 for years 2024-2026
-            for (let year = 2024; year <= 2026; year++) {
+            // Test week numbers 1-99 for years 2024-2030
+            for (let year = 2024; year <= 2030; year++) {
                 for (let week = 1; week <= 99; week++) {
                     const weekStr = week.toString().padStart(2, '0');
                     const filename = `W${weekStr}_${year}.xlsx`;
