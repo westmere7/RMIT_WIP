@@ -588,7 +588,7 @@
             
             .header-logo {
                 flex-shrink: 0;
-                height: 32px;
+                height: 24px;
                 order: 2;
                 align-self: flex-start;
             }
@@ -598,6 +598,41 @@
                 margin-left: 0;
                 font-size: 0.85em;
                 padding: 8px 12px;
+                order: 3;
+            }
+            
+            /* Force selector to take full width on its own row */
+            .header-left {
+                width: 100%;
+            }
+            
+            /* Ensure first row has name+logo, second row has selector */
+            @supports (display: grid) {
+                .header {
+                    display: grid;
+                    grid-template-columns: 1fr auto;
+                    grid-template-rows: auto auto;
+                    gap: 10px;
+                }
+                
+                .header-left {
+                    grid-column: 1;
+                    grid-row: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                
+                .header-logo {
+                    grid-column: 2;
+                    grid-row: 1;
+                }
+                
+                .week-selector {
+                    grid-column: 1 / -1;
+                    grid-row: 2;
+                    width: 100%;
+                }
             }
             
             .header h1 {
@@ -701,7 +736,7 @@
             
             .header-logo {
                 flex-shrink: 0;
-                height: 32px;
+                height: 20px;
                 order: 2;
                 align-self: flex-start;
             }
@@ -711,6 +746,41 @@
                 margin-left: 0;
                 font-size: 0.8em;
                 padding: 8px 10px;
+                order: 3;
+            }
+            
+            /* Force selector to take full width on its own row */
+            .header-left {
+                width: 100%;
+            }
+            
+            /* Ensure first row has name+logo, second row has selector */
+            @supports (display: grid) {
+                .header {
+                    display: grid;
+                    grid-template-columns: 1fr auto;
+                    grid-template-rows: auto auto;
+                    gap: 8px;
+                }
+                
+                .header-left {
+                    grid-column: 1;
+                    grid-row: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0;
+                }
+                
+                .header-logo {
+                    grid-column: 2;
+                    grid-row: 1;
+                }
+                
+                .week-selector {
+                    grid-column: 1 / -1;
+                    grid-row: 2;
+                    width: 100%;
+                }
             }
             
             .header h1 {
@@ -858,11 +928,11 @@
                     <h1 id="teamName">Design Team</h1>
                     <div class="date" id="headerDate">Loading...</div>
                 </div>
-                <select id="weekSelector" class="week-selector" style="display: none;">
-                    <option value="">Select Week</option>
-                </select>
             </div>
             <img src="data/RMIT_logo_white.svg" alt="RMIT Logo" class="header-logo">
+            <select id="weekSelector" class="week-selector" style="display: none;">
+                <option value="">Select Week</option>
+            </select>
         </div>
         
         <div id="loadingMessage" class="loading">Loading data...</div>
@@ -947,8 +1017,14 @@
                         { file: 'W46_2025.xlsx', week: 46, year: 2025 }
                     ];
                 }
-                // Auto-discover: Try to load files matching pattern even if not in manifest
-                await autoDiscoverWeeks();
+                // Skip auto-discovery if manifest has files (for faster loading)
+                // To force auto-discovery, delete weeks.json or run generate_weeks_list.py
+                if (AVAILABLE_WEEKS.length === 0) {
+                    console.log('No weeks in manifest, attempting auto-discovery...');
+                    await autoDiscoverWeeks();
+                } else {
+                    console.log('Using manifest (faster). To add new weeks, run: python3 generate_weeks_list.py');
+                }
             } catch (error) {
                 console.error('Error loading weeks manifest:', error);
                 // Use fallback
