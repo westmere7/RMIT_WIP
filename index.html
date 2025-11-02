@@ -141,7 +141,7 @@
             margin-bottom: 16px;
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0, 0, 0, 0.06);
+            border: 2px solid transparent;
             border-radius: 16px;
         }
         
@@ -187,8 +187,8 @@
             justify-content: space-between;
             align-items: center;
             gap: 12px;
-            transition: transform 0.15s ease, border 0.15s ease, box-shadow 0.15s ease;
-            border: 1px solid rgba(0, 0, 0, 0.06);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            border: 2px solid transparent;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         
@@ -565,16 +565,29 @@
             
             .header {
                 padding: 12px 16px;
-                flex-direction: row;
-                gap: 12px;
+                flex-direction: column;
+                gap: 10px;
                 text-align: left;
             }
             
             .header-left {
-                flex-direction: column;
-                align-items: flex-start;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
                 gap: 10px;
                 width: 100%;
+                order: 1;
+            }
+            
+            .header-content {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .header-logo {
+                flex-shrink: 0;
+                height: 32px;
+                order: 2;
             }
             
             .week-selector {
@@ -582,6 +595,7 @@
                 margin-left: 0;
                 font-size: 0.85em;
                 padding: 8px 12px;
+                order: 3;
             }
             
             .header h1 {
@@ -669,13 +683,27 @@
             .header {
                 padding: 12px 14px;
                 gap: 8px;
+                flex-direction: column;
             }
             
             .header-left {
-                flex-direction: column;
-                align-items: flex-start;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
                 gap: 8px;
                 width: 100%;
+                order: 1;
+            }
+            
+            .header-content {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .header-logo {
+                flex-shrink: 0;
+                height: 32px;
+                order: 2;
             }
             
             .week-selector {
@@ -683,6 +711,7 @@
                 margin-left: 0;
                 font-size: 0.8em;
                 padding: 8px 10px;
+                order: 3;
             }
             
             .header h1 {
@@ -983,9 +1012,15 @@
             
             if (discovered > 0) {
                 console.log(`Auto-discovered ${discovered} additional weekly reports`);
-                // Sort by year and week
-                AVAILABLE_WEEKS.sort((a, b) => a.year === b.year ? a.week - b.week : a.year - b.year);
             }
+            
+            // Sort by most recent first (descending year, then descending week)
+            AVAILABLE_WEEKS.sort((a, b) => {
+                if (a.year !== b.year) {
+                    return b.year - a.year; // Most recent year first
+                }
+                return b.week - a.week; // Most recent week first
+            });
         }
         
         async function loadWeekData(filename) {
@@ -1037,17 +1072,26 @@
                 return;
             }
             
+            // Validate that files actually exist and filter out deleted ones
+            const validatedWeeks = await validateWeekFiles(AVAILABLE_WEEKS);
+            AVAILABLE_WEEKS = validatedWeeks;
+            
+            if (AVAILABLE_WEEKS.length === 0) {
+                showError('No valid weekly reports found. Files may have been deleted.');
+                return;
+            }
+            
             const selector = document.getElementById('weekSelector');
             selector.innerHTML = '<option value="">Select Week</option>';
             
-            // Populate dropdown with available weeks
+            // Populate dropdown with available weeks (sorted most recent first)
             AVAILABLE_WEEKS.forEach((weekData, index) => {
                 const option = document.createElement('option');
                 option.value = weekData.file;
                 option.textContent = `Week ${weekData.week} - ${weekData.year}`;
                 selector.appendChild(option);
                 
-                // Auto-select the first week
+                // Auto-select the first week (most recent)
                 if (index === 0) {
                     selector.value = weekData.file;
                 }
@@ -1063,10 +1107,44 @@
                 }
             });
             
-            // Load the first week's data
+            // Load the first week's data (most recent)
             if (AVAILABLE_WEEKS.length > 0) {
                 loadWeekData(AVAILABLE_WEEKS[0].file);
             }
+        }
+        
+        // Validate that week files actually exist
+        async function validateWeekFiles(weeks) {
+            const validWeeks = [];
+            
+            // Check files in batches
+            const batchSize = 10;
+            for (let i = 0; i < weeks.length; i += batchSize) {
+                const batch = weeks.slice(i, i + batchSize);
+                const results = await Promise.allSettled(
+                    batch.map(async (weekData) => {
+                        try {
+                            const response = await fetch(`data/${weekData.file}`, { method: 'HEAD' });
+                            if (response.ok) {
+                                return weekData;
+                            }
+                            console.warn(`File not found: ${weekData.file}`);
+                            return null;
+                        } catch {
+                            console.warn(`Error checking file: ${weekData.file}`);
+                            return null;
+                        }
+                    })
+                );
+                
+                results.forEach(result => {
+                    if (result.status === 'fulfilled' && result.value) {
+                        validWeeks.push(result.value);
+                    }
+                });
+            }
+            
+            return validWeeks;
         }
 
         function processData(data, weekInfo) {

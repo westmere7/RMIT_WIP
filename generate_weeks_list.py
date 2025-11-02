@@ -32,8 +32,8 @@ for filename in sorted(os.listdir(data_dir)):
             'year': year
         })
 
-# Sort by year and week
-available_weeks.sort(key=lambda x: (x['year'], x['week']))
+# Sort by most recent first (descending year, then descending week)
+available_weeks.sort(key=lambda x: (x['year'], x['week']), reverse=True)
 
 if len(available_weeks) == 0:
     print("??  No weekly report files found!")
