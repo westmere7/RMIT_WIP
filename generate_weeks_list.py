@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 """
 Auto-generate weeks.json manifest for available weekly reports
-Scans data directory for WXX_YYYY.xlsx files (any week 1-99, any year)
+Scans data/reports directory for WXX_YYYY.xlsx files (any week 1-99, any year)
 
 Usage:
     python3 generate_weeks_list.py
 
-After adding new weekly report files, run this script to update data/weeks.json
+After adding new weekly report files to data/reports/, run this script to update data/weeks.json
 The website will automatically load the updated list on next page load.
-
-Note: The website can auto-discover files on its own, but using this script
-provides instant loading instead of checking each possible filename.
 """
 import os
 import re
 import json
 
-# Scan data directory for weekly report files
-data_dir = 'data'
+# Scan data/reports directory for weekly report files
+data_dir = 'data/reports'
 week_pattern = re.compile(r'W(\d{2})_(\d{4})\.xlsx')
 
 available_weeks = []

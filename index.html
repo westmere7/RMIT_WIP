@@ -934,9 +934,8 @@
                     <h1 id="teamName">Design Team</h1>
                     <div class="date" id="headerDate">Loading...</div>
                 </div>
-                <select id="weekSelector" class="week-selector" style="display: none;">
-                    <option value="">Select Week</option>
-                </select>
+            <select id="weekSelector" class="week-selector" style="display: none;">
+            </select>
             </div>
             <img src="data/RMIT_logo_white.svg" alt="RMIT Logo" class="header-logo">
         </div>
@@ -994,6 +993,8 @@
             <span id="footerText">Loading...</span>
             <span style="margin: 0 8px; color: #cbd5e0;">|</span>
             <span style="color: #4a5568; font-weight: 600;">Built and maintained by NTD</span>
+            <span style="margin: 0 8px; color: #cbd5e0;">|</span>
+            <span style="color: #718096;">v<span id="appVersion">...</span></span>
         </div>
     </div>
 
@@ -1007,6 +1008,26 @@
         let teamLoad = '';
         let currentWeekFile = '';
         let filtersInitialized = false;
+        let appVersion = 'Loading...';
+        
+        // Load config file
+        async function loadConfig() {
+            try {
+                const response = await fetch('config.txt');
+                if (response.ok) {
+                    const configText = await response.text();
+                    const lines = configText.split('\n');
+                    lines.forEach(line => {
+                        if (line.startsWith('VERSION=')) {
+                            appVersion = line.split('=')[1].trim();
+                        }
+                    });
+                    console.log(`App version: ${appVersion}`);
+                }
+            } catch (error) {
+                console.warn('Could not load config.txt');
+            }
+        }
         
         // Load available weeks from manifest file
         async function loadAvailableWeeks() {
@@ -1110,7 +1131,7 @@
                 document.getElementById('mainWrapper').style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'none';
                 
-                const response = await fetch(`data/${filename}`);
+                const response = await fetch(`data/reports/${filename}`);
                 if (!response.ok) {
                     throw new Error(`Failed to load Excel file: ${response.statusText}`);
                 }
@@ -1145,7 +1166,8 @@
         }
         
         async function initializeWeekSelector() {
-            // First load available weeks
+            // Load config and weeks
+            await loadConfig();
             await loadAvailableWeeks();
             
             if (AVAILABLE_WEEKS.length === 0) {
@@ -1163,7 +1185,7 @@
             }
             
             const selector = document.getElementById('weekSelector');
-            selector.innerHTML = '<option value="">Select Week</option>';
+            selector.innerHTML = '';
             
             // Populate dropdown with available weeks (sorted most recent first)
             AVAILABLE_WEEKS.forEach((weekData, index) => {
@@ -1244,10 +1266,11 @@
                 // Timeline already includes parentheses
                 const fullWeekInfo = timeline ? `${weekInfo} ${timeline}` : weekInfo;
                 
-                // Update header
+                // Update header and footer
                 document.getElementById('teamName').textContent = teamName;
                 document.getElementById('headerDate').textContent = fullWeekInfo;
                 document.getElementById('footerText').textContent = lastUpdated;
+                document.getElementById('appVersion').textContent = appVersion;
                 
                 // Row 2 (index 1): Column headers - skip
                 

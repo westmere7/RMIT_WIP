@@ -5,7 +5,7 @@
 ### Simple Workflow
 **Every time you add a new file:**
 
-1. Add `WXX_YYYY.xlsx` to the `data/` folder
+1. Add `WXX_YYYY.xlsx` to the `data/reports/` folder
 2. Run the generator script:
    ```bash
    python3 generate_weeks_list.py
@@ -80,9 +80,22 @@ The following status badges are supported:
 - **On Hold** - Paused (RMIT red)
 - **To Do** - Not started (violet)
 
+## File Structure
+
+```
+data/
+??? reports/           # Put weekly report files here
+?   ??? W47_2025.xlsx
+?   ??? W48_2025.xlsx
+?   ??? W48_2026.xlsx
+??? weeks.json         # Generated manifest (don't edit manually)
+??? RMIT_logo_white.svg
+```
+
 ## Troubleshooting
 
 **Q: I added a new file but it doesn't show up**
+- Did you put it in `data/reports/` folder?
 - Did you run `python3 generate_weeks_list.py`?
 - Make sure the filename follows the exact format: `WXX_YYYY.xlsx`
 - Check the browser console (F12) for any errors
