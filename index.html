@@ -60,6 +60,35 @@
             width: auto;
         }
         
+        .week-selector {
+            padding: 8px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-size: 0.9em;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            outline: none;
+        }
+        
+        .week-selector:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .week-selector:focus {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: white;
+        }
+        
+        .week-selector option {
+            background: #2d3748;
+            color: white;
+        }
+        
         .loading {
             text-align: center;
             padding: 60px 20px;
@@ -530,6 +559,15 @@
                 flex-direction: row;
                 gap: 12px;
                 text-align: left;
+                flex-wrap: wrap;
+            }
+            
+            .week-selector {
+                order: 3;
+                width: 100%;
+                margin-top: 8px;
+                font-size: 0.85em;
+                padding: 8px 12px;
             }
             
             .header-left {
@@ -547,6 +585,7 @@
             
             .header-logo {
                 height: 32px;
+                order: 2;
             }
             
             .dashboard {
@@ -621,6 +660,15 @@
             .header {
                 padding: 12px 14px;
                 gap: 8px;
+                flex-wrap: wrap;
+            }
+            
+            .week-selector {
+                order: 3;
+                width: 100%;
+                margin-top: 6px;
+                font-size: 0.8em;
+                padding: 8px 10px;
             }
             
             .header h1 {
@@ -633,6 +681,7 @@
             
             .header-logo {
                 height: 32px;
+                order: 2;
             }
             
             .dashboard {
@@ -771,6 +820,9 @@
                 <h1 id="teamName">Design Team</h1>
                 <div class="date" id="headerDate">Loading...</div>
             </div>
+            <select id="weekSelector" class="week-selector" style="display: none;">
+                <option value="">Select Week</option>
+            </select>
             <img src="data/RMIT_logo_white.svg" alt="RMIT Logo" class="header-logo">
         </div>
         
@@ -831,16 +883,27 @@
     </div>
 
     <script>
+        // Configuration: List of available weekly report files
+        const AVAILABLE_WEEKS = [
+            { file: 'W45_2025.xlsx', week: 45, year: 2025 },
+            { file: 'W46_2025.xlsx', week: 46, year: 2025 }
+        ];
+        
         let allTasks = [];
         let currentFilters = {
             pic: '',
             status: ''
         };
         let teamLoad = '';
+        let currentWeekFile = '';
         
-        async function loadCSV() {
+        async function loadWeekData(filename) {
             try {
-                const response = await fetch('data/wip.xlsx');
+                document.getElementById('loadingMessage').style.display = 'block';
+                document.getElementById('mainWrapper').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+                
+                const response = await fetch(`data/${filename}`);
                 if (!response.ok) {
                     throw new Error(`Failed to load Excel file: ${response.statusText}`);
                 }
@@ -854,23 +917,78 @@
                 // Convert to array of arrays
                 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
                 
-                processData(data);
+                // Parse week info from filename
+                const weekInfo = parseWeekFromFilename(filename);
+                
+                processData(data, weekInfo);
+                currentWeekFile = filename;
             } catch (error) {
                 showError('Error loading Excel file: ' + error.message);
             }
         }
+        
+        function parseWeekFromFilename(filename) {
+            // Extract week number from filename like W45_2025.xlsx
+            const match = filename.match(/W(\d+)_(\d+)\.xlsx/);
+            if (match) {
+                const weekNum = match[1];
+                const year = match[2];
+                return `Week ${weekNum} - ${year}`;
+            }
+            return 'Week';
+        }
+        
+        function initializeWeekSelector() {
+            const selector = document.getElementById('weekSelector');
+            selector.innerHTML = '<option value="">Select Week</option>';
+            
+            // Populate dropdown with available weeks
+            AVAILABLE_WEEKS.forEach((weekData, index) => {
+                const option = document.createElement('option');
+                option.value = weekData.file;
+                option.textContent = `Week ${weekData.week} - ${weekData.year}`;
+                selector.appendChild(option);
+                
+                // Auto-select the first week
+                if (index === 0) {
+                    selector.value = weekData.file;
+                }
+            });
+            
+            // Show the selector
+            selector.style.display = 'block';
+            
+            // Add change event listener
+            selector.addEventListener('change', function() {
+                if (this.value) {
+                    loadWeekData(this.value);
+                }
+            });
+            
+            // Load the first week's data
+            if (AVAILABLE_WEEKS.length > 0) {
+                loadWeekData(AVAILABLE_WEEKS[0].file);
+            }
+        }
 
-        function processData(data) {
+        function processData(data, weekInfo) {
             try {
-                // Row 1 (index 0): Headers - A: Week info, B: Team name, C: Last updated, D: Team Load
-                const weekInfo = data[0][0] || 'Week';
+                // New structure:
+                // A1: Timeline (e.g., "4-11 Nov")
+                // B1: Team name
+                // C1: Last updated
+                // D1: Team Load
+                const timeline = data[0][0] || '';
                 const teamName = data[0][1] || 'Design Team';
                 const lastUpdated = data[0][2] || '';
                 teamLoad = data[0][3] || '-';
                 
+                // Combine week info from filename with timeline from A1
+                const fullWeekInfo = timeline ? `${weekInfo} (${timeline})` : weekInfo;
+                
                 // Update header
                 document.getElementById('teamName').textContent = teamName;
-                document.getElementById('headerDate').textContent = weekInfo;
+                document.getElementById('headerDate').textContent = fullWeekInfo;
                 document.getElementById('footerText').textContent = lastUpdated;
                 
                 // Row 2 (index 1): Column headers - skip
@@ -1205,8 +1323,8 @@
             document.getElementById('errorMessage').style.display = 'block';
         }
 
-        // Load data on page load
-        loadCSV();
+        // Initialize week selector and load data on page load
+        initializeWeekSelector();
     </script>
 </body>
 </html>
