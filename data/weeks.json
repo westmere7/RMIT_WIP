@@ -1,12 +1,17 @@
 [
   {
-    "file": "W46_2025.xlsx",
-    "week": 46,
+    "file": "W01_2026.xlsx",
+    "week": 1,
+    "year": 2026
+  },
+  {
+    "file": "W47_2025.xlsx",
+    "week": 47,
     "year": 2025
   },
   {
-    "file": "W12_2025.xlsx",
-    "week": 12,
+    "file": "W46_2025.xlsx",
+    "week": 46,
     "year": 2025
   }
 ]
