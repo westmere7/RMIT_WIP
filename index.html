@@ -35,17 +35,29 @@
             box-shadow: 0 2px 8px rgba(230,30,42,0.1);
         }
         
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
         .header h1 {
             font-size: 1.75em;
             font-weight: 700;
             color: white;
             letter-spacing: -0.5px;
+            margin: 0;
         }
         
         .header .date {
-            font-size: 0.95em;
-            color: rgba(255,255,255,0.9);
-            font-weight: 500;
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.85);
+            font-weight: 400;
+        }
+        
+        .header-logo {
+            height: 50px;
+            width: auto;
         }
         
         .loading {
@@ -72,7 +84,7 @@
         .project-section {
             background: #ffffff;
             backdrop-filter: blur(10px);
-            border-radius: 12px;
+            border-radius: 6px;
             padding: 0;
             border: 1px solid #f1f5f9;
             overflow: hidden;
@@ -97,7 +109,7 @@
         
         .task-card {
             background: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 4px;
             padding: 12px 14px;
             margin-bottom: 8px;
             border-left: 3px solid #E61E2A;
@@ -147,7 +159,7 @@
         
         .status-badge {
             padding: 5px 11px;
-            border-radius: 6px;
+            border-radius: 4px;
             font-size: 0.7em;
             font-weight: 700;
             text-transform: uppercase;
@@ -201,7 +213,7 @@
             background: linear-gradient(135deg, #4a5568, #2d3748);
             color: white;
             padding: 5px 11px;
-            border-radius: 6px;
+            border-radius: 4px;
             font-size: 0.7em;
             font-weight: 600;
             white-space: nowrap;
@@ -233,12 +245,20 @@
             .header {
                 padding: 20px 24px;
                 flex-direction: column;
-                gap: 8px;
+                gap: 12px;
                 text-align: center;
+            }
+            
+            .header-left {
+                align-items: center;
             }
             
             .header h1 {
                 font-size: 1.5em;
+            }
+            
+            .header-logo {
+                height: 40px;
             }
         }
         
@@ -262,8 +282,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 id="teamName">Design Team</h1>
-            <div class="date" id="headerDate">Loading...</div>
+            <div class="header-left">
+                <h1 id="teamName">Design Team</h1>
+                <div class="date" id="headerDate">Loading...</div>
+            </div>
+            <img src="data/RMIT_logo_white.svg" alt="RMIT Logo" class="header-logo">
         </div>
         
         <div id="loadingMessage" class="loading">Loading data...</div>
