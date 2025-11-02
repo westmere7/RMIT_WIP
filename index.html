@@ -301,48 +301,11 @@
     <script>
         async function loadCSV() {
             try {
-                // Add cache busting to ensure fresh file metadata
-                const cacheBuster = '?t=' + new Date().getTime();
-                const response = await fetch('data/wip.xlsx' + cacheBuster, {
-                    cache: 'no-store'
-                });
+                const response = await fetch('data/wip.xlsx');
                 if (!response.ok) {
                     throw new Error(`Failed to load Excel file: ${response.statusText}`);
                 }
-                
-                // Try to get last modified date from response headers
-                const lastModified = response.headers.get('Last-Modified');
-                let lastModifiedDate = null;
-                if (lastModified) {
-                    lastModifiedDate = new Date(lastModified);
-                }
-                
                 const arrayBuffer = await response.arrayBuffer();
-                
-                // If we couldn't get Last-Modified from headers, try to get file stats via API
-                if (!lastModifiedDate) {
-                    try {
-                        // Try both PHP and Python endpoints
-                        let statsResponse = await fetch('file-stats?file=data/wip.xlsx', {
-                            cache: 'no-store'
-                        });
-                        if (!statsResponse.ok) {
-                            statsResponse = await fetch('file-stats.php?file=data/wip.xlsx', {
-                                cache: 'no-store'
-                            });
-                        }
-                        if (statsResponse.ok) {
-                            const stats = await statsResponse.json();
-                            if (stats.lastModified) {
-                                lastModifiedDate = new Date(stats.lastModified * 1000);
-                            }
-                        }
-                    } catch (e) {
-                        // Fallback: use current time as indication
-                        console.log('Could not get file stats:', e);
-                    }
-                }
-                
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
                 
                 // Get the first sheet
@@ -352,32 +315,18 @@
                 // Convert to array of arrays
                 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
                 
-                processData(data, lastModifiedDate);
+                processData(data);
             } catch (error) {
                 showError('Error loading Excel file: ' + error.message);
             }
         }
 
-        function processData(data, lastModifiedDate) {
+        function processData(data) {
             try {
                 // Row 1 (index 0): Headers - A: Week info, B: Team name, C: Last updated
                 const weekInfo = data[0][0] || 'Week';
                 const teamName = data[0][1] || 'Design Team';
-                
-                // Format last modified date
-                let lastUpdated = '';
-                if (lastModifiedDate) {
-                    const options = { 
-                        year: 'numeric', 
-                        month: 'short', 
-                        day: 'numeric', 
-                        hour: '2-digit', 
-                        minute: '2-digit'
-                    };
-                    lastUpdated = 'Last updated: ' + lastModifiedDate.toLocaleString('en-US', options);
-                } else {
-                    lastUpdated = data[0][2] || '';
-                }
+                const lastUpdated = data[0][2] || '';
                 
                 // Update header
                 document.getElementById('teamName').textContent = teamName;
