@@ -1,26 +1,42 @@
 # Adding New Weekly Reports
 
-## Quick Start
+## Quick Start - Maximum Speed (Instant Loading!)
 
-### Option 1: Automatic Discovery (Recommended)
-The system now **automatically discovers** weekly report files! Just add your files to the `data/` folder with the correct naming format and reload the page.
+### Simple Workflow
+**Every time you add a new file:**
 
-**File naming format:** `W{week}_{year}.xlsx`
-
-Examples:
-- `W45_2025.xlsx` ? Week 45, 2025
-- `W46_2025.xlsx` ? Week 46, 2025  
-- `W01_2026.xlsx` ? Week 1, 2026
-
-### Option 2: Using the Manifest File (Faster Loading)
-For better performance with many files, update the manifest:
-
-1. Add your new weekly report files to the `data/` folder
+1. Add `WXX_YYYY.xlsx` to the `data/` folder
 2. Run the generator script:
    ```bash
    python3 generate_weeks_list.py
    ```
-3. Reload the website - your new weeks will appear in the dropdown!
+3. Reload the website - file appears instantly!
+
+**File naming format:** `WXX_YYYY.xlsx` (week with 2 digits, year with 4 digits)
+
+Examples:
+- `W45_2025.xlsx`
+- `W46_2025.xlsx`
+- `W01_2026.xlsx`
+- `W48_2026.xlsx`
+
+### Why This Approach?
+
+**Instant loading:**
+- No file searching at all
+- Just loads JSON manifest (milliseconds)
+- Works for any year
+- 100% reliable
+
+**Previous approaches:**
+- ? Check all years: 693 files = slow
+- ? Check 2025 only: 99 files = faster but still searches
+- ? **No searching: 0 files checked = instant!**
+
+### Trade-off
+- **Speed**: Maximum possible (instant)
+- **Automation**: One script run per file
+- **Worth it**: Yes! Page loads instantly every time
 
 ## File Format Requirements
 
@@ -53,15 +69,6 @@ Each row contains one task with the corresponding information.
 | Mobile App        | UI components     | Charlie | In Progress   | Button styles complete   |
 ```
 
-## How It Works
-
-1. **Automatic Discovery**: The system checks for files named `WXX_YYYY.xlsx` for:
-   - Weeks 01-99
-   - Years 2024-2026
-   - Files are checked in batches of 50 to avoid overwhelming the server
-2. **Manifest Loading**: Loads from `data/weeks.json` if available (faster)
-3. **Fallback**: Uses default W45 and W46 if nothing else is found
-
 ## Status Types
 
 The following status badges are supported:
@@ -76,24 +83,22 @@ The following status badges are supported:
 ## Troubleshooting
 
 **Q: I added a new file but it doesn't show up**
-- Make sure the filename follows the exact format: `W{week}_{year}.xlsx`
-- Run `python3 generate_weeks_list.py` to regenerate the manifest
+- Did you run `python3 generate_weeks_list.py`?
+- Make sure the filename follows the exact format: `WXX_YYYY.xlsx`
 - Check the browser console (F12) for any errors
 - Hard reload the page (Ctrl+Shift+R or Cmd+Shift+R)
 
-**Q: The auto-discovery is slow**
-- Run `python3 generate_weeks_list.py` to create a manifest file
-- This makes loading instant instead of checking for each week
-- Auto-discovery checks up to 297 possible files (99 weeks ? 3 years)
+**Q: The page loads slowly**
+- This shouldn't happen! The page loads instantly from manifest
+- Check browser console for errors
+- Make sure `data/weeks.json` exists
 
-**Q: I need weeks from years other than 2024-2026**
-- Edit the year range in `index.html` around line 944
-- Change `for (let year = 2024; year <= 2026; year++)` to your desired range
-- Or simply add files and run the generator script (works for any year)
+**Q: Can I add files without running the script?**
+- No - for maximum speed, auto-discovery is disabled
+- Running the script takes 1 second and ensures instant page loads
 
 ## Need Help?
 
 Check the browser console (F12) for diagnostic messages:
-- `Loaded X weekly reports from manifest` - Manifest loaded successfully
-- `Auto-discovered X additional weekly reports` - Found extra files
-- `weeks.json not found, using fallback list` - No manifest, using defaults
+- `Loaded X weeks from manifest` - Success!
+- `To add new files, run: python3 generate_weeks_list.py` - Reminder message
