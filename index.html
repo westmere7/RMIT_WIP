@@ -305,6 +305,14 @@
                 if (!response.ok) {
                     throw new Error(`Failed to load Excel file: ${response.statusText}`);
                 }
+                
+                // Get last modified date from response headers
+                const lastModified = response.headers.get('Last-Modified');
+                let lastModifiedDate = null;
+                if (lastModified) {
+                    lastModifiedDate = new Date(lastModified);
+                }
+                
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
                 
@@ -315,18 +323,32 @@
                 // Convert to array of arrays
                 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
                 
-                processData(data);
+                processData(data, lastModifiedDate);
             } catch (error) {
                 showError('Error loading Excel file: ' + error.message);
             }
         }
 
-        function processData(data) {
+        function processData(data, lastModifiedDate) {
             try {
                 // Row 1 (index 0): Headers - A: Week info, B: Team name, C: Last updated
                 const weekInfo = data[0][0] || 'Week';
                 const teamName = data[0][1] || 'Design Team';
-                const lastUpdated = data[0][2] || '';
+                
+                // Format last modified date
+                let lastUpdated = '';
+                if (lastModifiedDate) {
+                    const options = { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit'
+                    };
+                    lastUpdated = 'Last updated: ' + lastModifiedDate.toLocaleString('en-US', options);
+                } else {
+                    lastUpdated = data[0][2] || '';
+                }
                 
                 // Update header
                 document.getElementById('teamName').textContent = teamName;
