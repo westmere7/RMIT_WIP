@@ -23,6 +23,7 @@
         .container {
             max-width: 100%;
             margin: 0 auto;
+            padding-bottom: 50px;
         }
         
         .header {
@@ -531,12 +532,17 @@
         .footer {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 16px 32px;
+            padding: 12px 24px;
             text-align: center;
             color: #718096;
-            font-size: 0.85em;
+            font-size: 0.75em;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
             border-radius: 24px 24px 0 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
         }
         
         @media (max-width: 1400px) {
@@ -840,8 +846,8 @@
             }
             
             .footer {
-                padding: 12px 14px;
-                font-size: 0.8em;
+                padding: 10px 12px;
+                font-size: 0.7em;
             }
         }
     </style>
@@ -913,7 +919,7 @@
         
         <div class="footer" id="footer">
             <span id="footerText">Loading...</span>
-            <span style="margin: 0 8px; color: #cbd5e0;">?</span>
+            <span style="margin: 0 8px; color: #cbd5e0;">|</span>
             <span style="color: #4a5568; font-weight: 600;">Built and maintained by NTD</span>
         </div>
     </div>
