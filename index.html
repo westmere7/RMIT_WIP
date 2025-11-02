@@ -33,9 +33,17 @@
             align-items: center;
             box-shadow: 0 10px 30px rgba(230,30,42,0.2);
             border-radius: 0 0 24px 24px;
+            gap: 16px;
         }
         
         .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .header-content {
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -61,10 +69,10 @@
         }
         
         .week-selector {
-            padding: 8px 16px;
+            padding: 10px 18px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
-            font-size: 0.9em;
+            font-size: 1em;
             background: rgba(255, 255, 255, 0.15);
             color: white;
             cursor: pointer;
@@ -72,6 +80,7 @@
             font-weight: 600;
             backdrop-filter: blur(10px);
             outline: none;
+            margin-left: 16px;
         }
         
         .week-selector:hover {
@@ -559,20 +568,20 @@
                 flex-direction: row;
                 gap: 12px;
                 text-align: left;
-                flex-wrap: wrap;
-            }
-            
-            .week-selector {
-                order: 3;
-                width: 100%;
-                margin-top: 8px;
-                font-size: 0.85em;
-                padding: 8px 12px;
             }
             
             .header-left {
+                flex-direction: column;
                 align-items: flex-start;
-                gap: 4px;
+                gap: 10px;
+                width: 100%;
+            }
+            
+            .week-selector {
+                width: 100%;
+                margin-left: 0;
+                font-size: 0.85em;
+                padding: 8px 12px;
             }
             
             .header h1 {
@@ -660,13 +669,18 @@
             .header {
                 padding: 12px 14px;
                 gap: 8px;
-                flex-wrap: wrap;
+            }
+            
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                width: 100%;
             }
             
             .week-selector {
-                order: 3;
                 width: 100%;
-                margin-top: 6px;
+                margin-left: 0;
                 font-size: 0.8em;
                 padding: 8px 10px;
             }
@@ -681,7 +695,6 @@
             
             .header-logo {
                 height: 32px;
-                order: 2;
             }
             
             .dashboard {
@@ -817,12 +830,14 @@
     <div class="container">
         <div class="header">
             <div class="header-left">
-                <h1 id="teamName">Design Team</h1>
-                <div class="date" id="headerDate">Loading...</div>
+                <div class="header-content">
+                    <h1 id="teamName">Design Team</h1>
+                    <div class="date" id="headerDate">Loading...</div>
+                </div>
+                <select id="weekSelector" class="week-selector" style="display: none;">
+                    <option value="">Select Week</option>
+                </select>
             </div>
-            <select id="weekSelector" class="week-selector" style="display: none;">
-                <option value="">Select Week</option>
-            </select>
             <img src="data/RMIT_logo_white.svg" alt="RMIT Logo" class="header-logo">
         </div>
         
@@ -932,8 +947,7 @@
             const match = filename.match(/W(\d+)_(\d+)\.xlsx/);
             if (match) {
                 const weekNum = match[1];
-                const year = match[2];
-                return `Week ${weekNum} - ${year}`;
+                return `Week ${weekNum}`;
             }
             return 'Week';
         }
@@ -974,7 +988,7 @@
         function processData(data, weekInfo) {
             try {
                 // New structure:
-                // A1: Timeline (e.g., "4-11 Nov")
+                // A1: Timeline with format like "(4-11 Nov 2025)"
                 // B1: Team name
                 // C1: Last updated
                 // D1: Team Load
@@ -984,7 +998,8 @@
                 teamLoad = data[0][3] || '-';
                 
                 // Combine week info from filename with timeline from A1
-                const fullWeekInfo = timeline ? `${weekInfo} (${timeline})` : weekInfo;
+                // Timeline already includes parentheses
+                const fullWeekInfo = timeline ? `${weekInfo} ${timeline}` : weekInfo;
                 
                 // Update header
                 document.getElementById('teamName').textContent = teamName;
@@ -1009,11 +1024,9 @@
                     }
                 }
                 
-                // Populate filter dropdowns
+                // Reset and populate filter dropdowns
+                resetFilters();
                 populateFilters();
-                
-                // Setup filter event listeners
-                setupFilters();
                 
                 // Populate dashboard
                 populateDashboard();
@@ -1094,6 +1107,21 @@
                     animateCount(countElement, 0, count, 800);
                 }, index * 100);
             });
+        }
+        
+        function resetFilters() {
+            // Clear current filters
+            currentFilters.pic = '';
+            currentFilters.status = '';
+            
+            // Clear filter dropdowns
+            const picFilter = document.getElementById('picFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            
+            picFilter.innerHTML = '<option value="">All People</option>';
+            statusFilter.innerHTML = '<option value="">All Statuses</option>';
+            
+            updateClearButton();
         }
         
         function populateFilters() {
