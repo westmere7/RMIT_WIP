@@ -92,13 +92,13 @@
         .content.individual-mode .task-card {
             margin-bottom: 16px;
             background: #ffffff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
             border: 1px solid #e2e8f0;
         }
         
         .content.individual-mode .task-card:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08);
-            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+            transform: translateY(-1px);
         }
         
         .project-section {
@@ -242,14 +242,14 @@
         
         .filters {
             background: #ffffff;
-            padding: 20px 24px;
+            padding: 14px 24px;
             border-bottom: 1px solid #e2e8f0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
         
         .filters-container {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             flex-wrap: wrap;
             align-items: center;
             max-width: 1600px;
@@ -259,12 +259,12 @@
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            min-width: 200px;
+            gap: 4px;
+            min-width: 180px;
         }
         
         .filter-label {
-            font-size: 0.85em;
+            font-size: 0.75em;
             font-weight: 600;
             color: #4a5568;
             text-transform: uppercase;
@@ -272,10 +272,10 @@
         }
         
         .filter-select {
-            padding: 10px 14px;
+            padding: 8px 12px;
             border: 1px solid #e2e8f0;
             border-radius: 4px;
-            font-size: 0.9em;
+            font-size: 0.85em;
             background: #fafafa;
             color: #2d3748;
             cursor: pointer;
@@ -295,16 +295,16 @@
         }
         
         .clear-filters {
-            padding: 10px 20px;
+            padding: 8px 16px;
             background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
             color: white;
             border: none;
             border-radius: 4px;
-            font-size: 0.9em;
+            font-size: 0.8em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 18px;
+            margin-top: 16px;
         }
         
         .clear-filters:hover {
@@ -325,6 +325,24 @@
             margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+            font-size: 1.1em;
+            background: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        
+        .no-results-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+            opacity: 0.3;
         }
         
         .footer {
@@ -615,6 +633,14 @@
             const contentDiv = document.getElementById('content');
             contentDiv.innerHTML = '';
             contentDiv.classList.add('individual-mode');
+            
+            if (tasks.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.innerHTML = '<div class="no-results-icon">??</div><div>No tasks found</div>';
+                contentDiv.appendChild(noResults);
+                return;
+            }
             
             tasks.forEach(task => {
                 const taskCard = document.createElement('div');
