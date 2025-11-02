@@ -187,7 +187,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 12px;
-            transition: all 0.3s ease;
+            transition: transform 0.15s ease, border 0.15s ease, box-shadow 0.15s ease;
             border: 1px solid rgba(0, 0, 0, 0.06);
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
@@ -906,6 +906,7 @@
         };
         let teamLoad = '';
         let currentWeekFile = '';
+        let filtersInitialized = false;
         
         // Load available weeks from manifest file
         async function loadAvailableWeeks() {
@@ -934,44 +935,51 @@
             }
         }
         
-        // Try to auto-discover additional week files
+        // Try to auto-discover week files matching WXX_YYYY.xlsx pattern
         async function autoDiscoverWeeks() {
             const knownFiles = new Set(AVAILABLE_WEEKS.map(w => w.file));
+            const testFiles = [];
             
-            // Try common week numbers (30-52 for typical year)
-            const currentYear = 2025;
-            const testWeeks = [];
-            
-            for (let week = 30; week <= 52; week++) {
-                const filename = `W${week}_${currentYear}.xlsx`;
-                if (!knownFiles.has(filename)) {
-                    testWeeks.push({ filename, week, year: currentYear });
+            // Test week numbers 1-99 for years 2024-2026
+            for (let year = 2024; year <= 2026; year++) {
+                for (let week = 1; week <= 99; week++) {
+                    const weekStr = week.toString().padStart(2, '0');
+                    const filename = `W${weekStr}_${year}.xlsx`;
+                    if (!knownFiles.has(filename)) {
+                        testFiles.push({ filename, week, year });
+                    }
                 }
             }
             
             // Test if files exist by attempting to fetch headers
-            const discoveries = await Promise.allSettled(
-                testWeeks.map(async ({filename, week, year}) => {
-                    try {
-                        const response = await fetch(`data/${filename}`, { method: 'HEAD' });
-                        if (response.ok) {
-                            return { file: filename, week, year };
-                        }
-                        return null;
-                    } catch {
-                        return null;
-                    }
-                })
-            );
-            
-            // Add discovered files to the list
+            // Test in batches to avoid too many concurrent requests
+            const batchSize = 50;
             let discovered = 0;
-            discoveries.forEach(result => {
-                if (result.status === 'fulfilled' && result.value) {
-                    AVAILABLE_WEEKS.push(result.value);
-                    discovered++;
-                }
-            });
+            
+            for (let i = 0; i < testFiles.length; i += batchSize) {
+                const batch = testFiles.slice(i, i + batchSize);
+                const discoveries = await Promise.allSettled(
+                    batch.map(async ({filename, week, year}) => {
+                        try {
+                            const response = await fetch(`data/${filename}`, { method: 'HEAD' });
+                            if (response.ok) {
+                                return { file: filename, week, year };
+                            }
+                            return null;
+                        } catch {
+                            return null;
+                        }
+                    })
+                );
+                
+                // Add discovered files to the list
+                discoveries.forEach(result => {
+                    if (result.status === 'fulfilled' && result.value) {
+                        AVAILABLE_WEEKS.push(result.value);
+                        discovered++;
+                    }
+                });
+            }
             
             if (discovered > 0) {
                 console.log(`Auto-discovered ${discovered} additional weekly reports`);
@@ -1103,6 +1111,12 @@
                 // Reset and populate filter dropdowns
                 resetFilters();
                 populateFilters();
+                
+                // Setup filter event listeners (only once)
+                if (!filtersInitialized) {
+                    setupFilters();
+                    filtersInitialized = true;
+                }
                 
                 // Populate dashboard
                 populateDashboard();
