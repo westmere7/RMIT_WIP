@@ -246,7 +246,6 @@
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
         }
         
         .filters-container {
@@ -353,15 +352,21 @@
             padding: 24px;
         }
         
-        .dashboard {
+        .sidebar {
             flex: 0 0 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: sticky;
+            top: 24px;
+            height: fit-content;
+        }
+        
+        .dashboard {
             background: #ffffff;
             border-radius: 6px;
             border: 1px solid #e2e8f0;
             padding: 20px;
-            height: fit-content;
-            position: sticky;
-            top: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
@@ -438,20 +443,10 @@
         .content-wrapper {
             flex: 1;
             min-width: 0;
-            display: flex;
-            flex-direction: column;
         }
         
         .content-wrapper .content {
             padding: 0;
-        }
-        
-        .content-wrapper .filters {
-            order: 1;
-        }
-        
-        .content-wrapper #content {
-            order: 2;
         }
         
         .footer {
@@ -476,12 +471,12 @@
                 padding: 16px;
             }
             
-            .dashboard {
+            .sidebar {
                 flex: none;
                 width: 100%;
                 position: static;
                 order: 1;
-                margin-bottom: 20px;
+                gap: 16px;
             }
             
             .content-wrapper {
@@ -564,26 +559,26 @@
         <div id="errorMessage" class="error" style="display: none;"></div>
         
         <div id="mainWrapper" class="main-wrapper" style="display: none;">
-            <div id="dashboard" class="dashboard">
-                <div class="dashboard-title">?? Overview</div>
-                
-                <div class="dashboard-stat">
-                    <div class="dashboard-stat-label">Total Tasks</div>
-                    <div class="dashboard-stat-value" id="totalTasks">0</div>
+            <div class="sidebar">
+                <div id="dashboard" class="dashboard">
+                    <div class="dashboard-title">?? Overview</div>
+                    
+                    <div class="dashboard-stat">
+                        <div class="dashboard-stat-label">Total Tasks</div>
+                        <div class="dashboard-stat-value" id="totalTasks">0</div>
+                    </div>
+                    
+                    <div class="dashboard-stat">
+                        <div class="dashboard-stat-label">Team Current Load</div>
+                        <div class="dashboard-stat-value" id="teamLoad">-</div>
+                    </div>
+                    
+                    <div class="dashboard-status-group">
+                        <div class="dashboard-stat-label" style="margin-bottom: 12px;">Tasks by Status</div>
+                        <div id="statusBreakdown"></div>
+                    </div>
                 </div>
                 
-                <div class="dashboard-stat">
-                    <div class="dashboard-stat-label">Team Current Load</div>
-                    <div class="dashboard-stat-value" id="teamLoad">-</div>
-                </div>
-                
-                <div class="dashboard-status-group">
-                    <div class="dashboard-stat-label" style="margin-bottom: 12px;">Tasks by Status</div>
-                    <div id="statusBreakdown"></div>
-                </div>
-            </div>
-            
-            <div class="content-wrapper">
                 <div id="filters" class="filters" style="display: none;">
                     <div class="filters-container">
                         <div class="filter-group">
@@ -603,7 +598,9 @@
                         </div>
                     </div>
                 </div>
-                
+            </div>
+            
+            <div class="content-wrapper">
                 <div id="content" class="content"></div>
             </div>
         </div>
