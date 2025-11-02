@@ -596,6 +596,7 @@
             .week-selector {
                 width: 100%;
                 margin-left: 0;
+                margin-top: 12px;
                 font-size: 0.85em;
                 padding: 8px 12px;
                 order: 3;
@@ -633,6 +634,7 @@
                     grid-row: 2;
                     width: 100%;
                     margin-left: 0;
+                    margin-top: 12px;
                 }
             }
             
@@ -745,6 +747,7 @@
             .week-selector {
                 width: 100%;
                 margin-left: 0;
+                margin-top: 10px;
                 font-size: 0.8em;
                 padding: 8px 10px;
                 order: 3;
@@ -782,6 +785,7 @@
                     grid-row: 2;
                     width: 100%;
                     margin-left: 0;
+                    margin-top: 10px;
                 }
             }
             
@@ -1019,9 +1023,9 @@
                         { file: 'W46_2025.xlsx', week: 46, year: 2025 }
                     ];
                 }
-                // Always run auto-discovery to find new files automatically
-                // This ensures newly added files appear without manual intervention
-                await autoDiscoverWeeks();
+                // Skip auto-discovery for maximum speed
+                // Run 'python3 generate_weeks_list.py' after adding new files
+                console.log(`Loaded ${AVAILABLE_WEEKS.length} weeks from manifest. To add new files, run: python3 generate_weeks_list.py`);
             } catch (error) {
                 console.error('Error loading weeks manifest:', error);
                 // Use fallback
