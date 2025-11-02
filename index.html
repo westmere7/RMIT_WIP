@@ -898,12 +898,7 @@
     </div>
 
     <script>
-        // Configuration: List of available weekly report files
-        const AVAILABLE_WEEKS = [
-            { file: 'W45_2025.xlsx', week: 45, year: 2025 },
-            { file: 'W46_2025.xlsx', week: 46, year: 2025 }
-        ];
-        
+        let AVAILABLE_WEEKS = [];
         let allTasks = [];
         let currentFilters = {
             pic: '',
@@ -911,6 +906,79 @@
         };
         let teamLoad = '';
         let currentWeekFile = '';
+        
+        // Load available weeks from manifest file
+        async function loadAvailableWeeks() {
+            try {
+                const response = await fetch('data/weeks.json');
+                if (response.ok) {
+                    AVAILABLE_WEEKS = await response.json();
+                    console.log(`Loaded ${AVAILABLE_WEEKS.length} weekly reports from manifest`);
+                } else {
+                    // Fallback to hardcoded list if manifest not found
+                    console.warn('weeks.json not found, using fallback list');
+                    AVAILABLE_WEEKS = [
+                        { file: 'W45_2025.xlsx', week: 45, year: 2025 },
+                        { file: 'W46_2025.xlsx', week: 46, year: 2025 }
+                    ];
+                }
+                // Auto-discover: Try to load files matching pattern even if not in manifest
+                await autoDiscoverWeeks();
+            } catch (error) {
+                console.error('Error loading weeks manifest:', error);
+                // Use fallback
+                AVAILABLE_WEEKS = [
+                    { file: 'W45_2025.xlsx', week: 45, year: 2025 },
+                    { file: 'W46_2025.xlsx', week: 46, year: 2025 }
+                ];
+            }
+        }
+        
+        // Try to auto-discover additional week files
+        async function autoDiscoverWeeks() {
+            const knownFiles = new Set(AVAILABLE_WEEKS.map(w => w.file));
+            
+            // Try common week numbers (30-52 for typical year)
+            const currentYear = 2025;
+            const testWeeks = [];
+            
+            for (let week = 30; week <= 52; week++) {
+                const filename = `W${week}_${currentYear}.xlsx`;
+                if (!knownFiles.has(filename)) {
+                    testWeeks.push({ filename, week, year: currentYear });
+                }
+            }
+            
+            // Test if files exist by attempting to fetch headers
+            const discoveries = await Promise.allSettled(
+                testWeeks.map(async ({filename, week, year}) => {
+                    try {
+                        const response = await fetch(`data/${filename}`, { method: 'HEAD' });
+                        if (response.ok) {
+                            return { file: filename, week, year };
+                        }
+                        return null;
+                    } catch {
+                        return null;
+                    }
+                })
+            );
+            
+            // Add discovered files to the list
+            let discovered = 0;
+            discoveries.forEach(result => {
+                if (result.status === 'fulfilled' && result.value) {
+                    AVAILABLE_WEEKS.push(result.value);
+                    discovered++;
+                }
+            });
+            
+            if (discovered > 0) {
+                console.log(`Auto-discovered ${discovered} additional weekly reports`);
+                // Sort by year and week
+                AVAILABLE_WEEKS.sort((a, b) => a.year === b.year ? a.week - b.week : a.year - b.year);
+            }
+        }
         
         async function loadWeekData(filename) {
             try {
@@ -952,7 +1020,15 @@
             return 'Week';
         }
         
-        function initializeWeekSelector() {
+        async function initializeWeekSelector() {
+            // First load available weeks
+            await loadAvailableWeeks();
+            
+            if (AVAILABLE_WEEKS.length === 0) {
+                showError('No weekly reports found. Please add W{week}_{year}.xlsx files to the data folder.');
+                return;
+            }
+            
             const selector = document.getElementById('weekSelector');
             selector.innerHTML = '<option value="">Select Week</option>';
             
