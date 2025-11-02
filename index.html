@@ -1,47 +1,426 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CSV A1 Viewer</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
-    #csv-data {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      font-size: 4rem;
-      font-family: sans-serif;
-      text-align: center;
-      padding: 1rem;
-      box-sizing: border-box;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VN Design Team - Week 31 Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e27;
+            padding: 0;
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #db2777 100%);
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.75em;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+        
+        .header .date {
+            font-size: 0.95em;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+            font-size: 1.1em;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 60px 20px;
+            color: #f87171;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+            gap: 20px;
+            grid-auto-flow: dense;
+        }
+        
+        .project-section {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 0;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            overflow: hidden;
+        }
+        
+        .project-section h2 {
+            font-size: 1em;
+            color: #60a5fa;
+            padding: 16px 18px;
+            background: rgba(30, 64, 175, 0.2);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        
+        .tasks-container {
+            padding: 12px;
+        }
+        
+        .task-card {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            border-left: 3px solid #3b82f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            border: 1px solid rgba(148, 163, 184, 0.05);
+        }
+        
+        .task-card:hover {
+            background: rgba(15, 23, 42, 0.8);
+            transform: translateX(2px);
+            border-left-color: #60a5fa;
+        }
+        
+        .task-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .task-left {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .task-title {
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .task-details {
+            color: #94a3b8;
+            font-size: 0.8em;
+        }
+        
+        .task-right {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .status-badge {
+            padding: 5px 11px;
+            border-radius: 6px;
+            font-size: 0.7em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        .status-done {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .status-review, .status-in-review {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        
+        .status-wip, .status-in-progress {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .status-updating {
+            background: rgba(168, 85, 247, 0.15);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+        
+        .status-blocked {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .status-on-hold {
+            background: rgba(156, 163, 175, 0.15);
+            color: #9ca3af;
+            border: 1px solid rgba(156, 163, 175, 0.3);
+        }
+        
+        .status-to-do {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .assignee {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 5px 11px;
+            border-radius: 6px;
+            font-size: 0.7em;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        .footer {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 16px 32px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.85em;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        @media (max-width: 1400px) {
+            .content {
+                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .content {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+            
+            .header {
+                padding: 20px 24px;
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                font-size: 12px;
+            }
+            
+            .task-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .task-right {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="csv-data">Loading…</div>
+    <div class="container">
+        <div class="header">
+            <h1 id="teamName">Design Team</h1>
+            <div class="date" id="headerDate">Loading...</div>
+        </div>
+        
+        <div id="loadingMessage" class="loading">Loading data...</div>
+        <div id="errorMessage" class="error" style="display: none;"></div>
+        <div id="content" class="content" style="display: none;"></div>
+        
+        <div class="footer" id="footer">
+            Loading...
+        </div>
+    </div>
 
-  <script>
-    fetch('source/Data.csv')
-      .then(response => {
-        if (!response.ok) throw new Error('Network response was not OK');
-        return response.text();
-      })
-      .then(text => {
-        const lines = text.split(/\r?\n/); // Split into rows
-        const firstRow = lines[0];
-        const firstCell = firstRow ? firstRow.split(',')[0] : '';
-        document.getElementById('csv-data').textContent = firstCell;
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById('csv-data').textContent = 'Error loading data';
-      });
-  </script>
+    <script>
+        async function loadCSV() {
+            try {
+                const response = await fetch('wip.xlsx');
+                if (!response.ok) {
+                    throw new Error(`Failed to load Excel file: ${response.statusText}`);
+                }
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                
+                // Get the first sheet
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                // Convert to array of arrays
+                const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                
+                processData(data);
+            } catch (error) {
+                showError('Error loading Excel file: ' + error.message);
+            }
+        }
+
+        function processData(data) {
+            try {
+                // Row 1 (index 0): Headers - A: Week info, B: Team name, C: Last updated
+                const weekInfo = data[0][0] || 'Week';
+                const teamName = data[0][1] || 'Design Team';
+                const lastUpdated = data[0][2] || '';
+                
+                // Update header
+                document.getElementById('teamName').textContent = teamName;
+                document.getElementById('headerDate').textContent = weekInfo;
+                document.getElementById('footer').textContent = lastUpdated;
+                
+                // Row 2 (index 1): Column headers - skip
+                
+                // Rows 3+ (index 2+): Data rows
+                // Columns: A: Campaign (group), B: Task, C: PIC, D: Status, E: Details
+                const tasks = [];
+                for (let i = 2; i < data.length; i++) {
+                    const row = data[i];
+                    if (row[0] || row[1]) { // Has campaign or task
+                        tasks.push({
+                            campaign: (row[0] || '').trim(),
+                            task: (row[1] || '').trim(),
+                            pic: (row[2] || '').trim(),
+                            status: (row[3] || '').trim(),
+                            details: (row[4] || '').trim()
+                        });
+                    }
+                }
+                
+                // Group tasks by campaign
+                const groupedTasks = {};
+                tasks.forEach(task => {
+                    if (task.campaign) {
+                        if (!groupedTasks[task.campaign]) {
+                            groupedTasks[task.campaign] = [];
+                        }
+                        groupedTasks[task.campaign].push(task);
+                    }
+                });
+                
+                // Render the content
+                renderContent(groupedTasks);
+                
+                // Show content, hide loading
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('content').style.display = 'grid';
+                
+            } catch (error) {
+                showError('Error processing data: ' + error.message);
+            }
+        }
+
+        function renderContent(groupedTasks) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = '';
+            
+            Object.keys(groupedTasks).forEach(campaign => {
+                const section = document.createElement('div');
+                section.className = 'project-section';
+                
+                const header = document.createElement('h2');
+                header.textContent = campaign;
+                section.appendChild(header);
+                
+                const tasksContainer = document.createElement('div');
+                tasksContainer.className = 'tasks-container';
+                
+                groupedTasks[campaign].forEach(task => {
+                    const taskCard = document.createElement('div');
+                    taskCard.className = 'task-card';
+                    
+                    const taskLeft = document.createElement('div');
+                    taskLeft.className = 'task-left';
+                    
+                    const taskTitle = document.createElement('div');
+                    taskTitle.className = 'task-title';
+                    taskTitle.textContent = task.task;
+                    taskLeft.appendChild(taskTitle);
+                    
+                    if (task.details) {
+                        const taskDetails = document.createElement('div');
+                        taskDetails.className = 'task-details';
+                        taskDetails.textContent = task.details;
+                        taskLeft.appendChild(taskDetails);
+                    }
+                    
+                    const taskRight = document.createElement('div');
+                    taskRight.className = 'task-right';
+                    
+                    if (task.status) {
+                        const statusBadge = document.createElement('span');
+                        statusBadge.className = 'status-badge ' + getStatusClass(task.status);
+                        statusBadge.textContent = task.status;
+                        taskRight.appendChild(statusBadge);
+                    }
+                    
+                    if (task.pic) {
+                        const assignee = document.createElement('span');
+                        assignee.className = 'assignee';
+                        assignee.textContent = task.pic;
+                        taskRight.appendChild(assignee);
+                    }
+                    
+                    taskCard.appendChild(taskLeft);
+                    taskCard.appendChild(taskRight);
+                    tasksContainer.appendChild(taskCard);
+                });
+                
+                section.appendChild(tasksContainer);
+                contentDiv.appendChild(section);
+            });
+        }
+
+        function getStatusClass(status) {
+            const statusLower = status.toLowerCase().replace(/\s+/g, '-');
+            return 'status-' + statusLower;
+        }
+
+        function showError(message) {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        // Load data on page load
+        loadCSV();
+    </script>
 </body>
 </html>
