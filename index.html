@@ -1023,9 +1023,16 @@
                         }
                     });
                     console.log(`App version: ${appVersion}`);
+                    // Update version in footer immediately
+                    document.getElementById('appVersion').textContent = appVersion;
+                } else {
+                    appVersion = '1.0.0';
+                    document.getElementById('appVersion').textContent = appVersion;
                 }
             } catch (error) {
                 console.warn('Could not load config.txt');
+                appVersion = '1.0.0';
+                document.getElementById('appVersion').textContent = appVersion;
             }
         }
         
@@ -1227,7 +1234,7 @@
                 const results = await Promise.allSettled(
                     batch.map(async (weekData) => {
                         try {
-                            const response = await fetch(`data/${weekData.file}`, { method: 'HEAD' });
+                            const response = await fetch(`data/reports/${weekData.file}`, { method: 'HEAD' });
                             if (response.ok) {
                                 return weekData;
                             }
