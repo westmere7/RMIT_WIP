@@ -237,6 +237,13 @@
             letter-spacing: 0.5px;
             white-space: nowrap;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .status-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
         .status-done {
@@ -290,6 +297,13 @@
             font-weight: 600;
             white-space: nowrap;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .assignee:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
         }
         
         .filters {
@@ -1462,6 +1476,19 @@
             clearButton.disabled = !hasFilters;
         }
         
+        // Helper function to set a specific filter programmatically
+        function setFilter(filterType, value) {
+            if (filterType === 'status') {
+                currentFilters.status = value;
+                document.getElementById('statusFilter').value = value;
+            } else if (filterType === 'pic') {
+                currentFilters.pic = value;
+                document.getElementById('picFilter').value = value;
+            }
+            updateClearButton();
+            applyFiltersAndRender();
+        }
+        
         function applyFiltersAndRender() {
             // Filter tasks based on current filters
             let filteredTasks = allTasks;
@@ -1538,23 +1565,33 @@
                 const taskRight = document.createElement('div');
                 taskRight.className = 'task-right';
                 
-                if (task.status) {
-                    const statusBadge = document.createElement('span');
-                    statusBadge.className = 'status-badge ' + getStatusClass(task.status);
-                    statusBadge.textContent = task.status;
-                    taskRight.appendChild(statusBadge);
-                }
-                
-                if (task.pic) {
-                    const assignee = document.createElement('span');
-                    assignee.className = 'assignee';
-                    assignee.textContent = task.pic;
-                    taskRight.appendChild(assignee);
-                }
-                
-                taskCard.appendChild(taskLeft);
-                taskCard.appendChild(taskRight);
-                contentDiv.appendChild(taskCard);
+                    if (task.status) {
+                        const statusBadge = document.createElement('span');
+                        statusBadge.className = 'status-badge ' + getStatusClass(task.status);
+                        statusBadge.textContent = task.status;
+                        statusBadge.title = 'Click to filter by this status';
+                        statusBadge.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            setFilter('status', task.status);
+                        });
+                        taskRight.appendChild(statusBadge);
+                    }
+                    
+                    if (task.pic) {
+                        const assignee = document.createElement('span');
+                        assignee.className = 'assignee';
+                        assignee.textContent = task.pic;
+                        assignee.title = 'Click to filter by this person';
+                        assignee.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            setFilter('pic', task.pic);
+                        });
+                        taskRight.appendChild(assignee);
+                    }
+                    
+                    taskCard.appendChild(taskLeft);
+                    taskCard.appendChild(taskRight);
+                    contentDiv.appendChild(taskCard);
             });
         }
         
@@ -1600,6 +1637,11 @@
                         const statusBadge = document.createElement('span');
                         statusBadge.className = 'status-badge ' + getStatusClass(task.status);
                         statusBadge.textContent = task.status;
+                        statusBadge.title = 'Click to filter by this status';
+                        statusBadge.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            setFilter('status', task.status);
+                        });
                         taskRight.appendChild(statusBadge);
                     }
                     
@@ -1607,6 +1649,11 @@
                         const assignee = document.createElement('span');
                         assignee.className = 'assignee';
                         assignee.textContent = task.pic;
+                        assignee.title = 'Click to filter by this person';
+                        assignee.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            setFilter('pic', task.pic);
+                        });
                         taskRight.appendChild(assignee);
                     }
                     
