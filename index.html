@@ -568,61 +568,57 @@
         }
         
         .trend-indicator {
-            font-size: 0.4em;
-            color: #9ca3af;
-            cursor: help;
             position: relative;
-            display: inline-flex;
-            align-items: center;
+            display: inline-block;
+            width: 0;
+            height: 0;
+            margin-left: 8px;
         }
         
-        .trend-indicator.up::before {
-            content: '?';
+        .trend-indicator.up {
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 8px solid #9ca3af;
         }
         
-        .trend-indicator.down::before {
-            content: '?';
+        .trend-indicator.down {
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid #9ca3af;
         }
         
-        .trend-indicator .tooltip {
-            visibility: hidden;
-            background-color: #1f2937;
-            color: white;
-            text-align: center;
-            padding: 8px 12px;
-            border-radius: 8px;
+        .trend-indicator[title]:hover::after {
+            content: attr(title);
             position: absolute;
-            z-index: 1000;
-            bottom: 125%;
+            bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
             white-space: nowrap;
-            font-size: 1.6em;
-            font-weight: 600;
-            opacity: 0;
-            transition: opacity 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin-bottom: 8px;
+            pointer-events: none;
+            z-index: 1000;
         }
         
-        .trend-indicator .tooltip::after {
-            content: "";
+        .dashboard-stat-value:hover .trend-indicator[title]::after {
+            content: attr(title);
             position: absolute;
-            top: 100%;
+            bottom: 100%;
             left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #1f2937 transparent transparent transparent;
-        }
-        
-        .trend-indicator:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-        
-        .dashboard-stat-value:hover .trend-indicator .tooltip {
-            visibility: visible;
-            opacity: 1;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            margin-bottom: 8px;
+            pointer-events: none;
+            z-index: 1000;
         }
         
         /* Workload level colors */
@@ -1709,18 +1705,13 @@
             if (previousWeekTaskCount !== null && previousWeekTaskCount !== totalTasks) {
                 const trendIndicator = document.createElement('span');
                 trendIndicator.className = 'trend-indicator';
+                trendIndicator.title = `Last week: ${previousWeekTaskCount} tasks`;
                 
                 if (totalTasks > previousWeekTaskCount) {
                     trendIndicator.classList.add('up');
                 } else {
                     trendIndicator.classList.add('down');
                 }
-                
-                // Add tooltip
-                const tooltip = document.createElement('span');
-                tooltip.className = 'tooltip';
-                tooltip.textContent = `Last week: ${previousWeekTaskCount} tasks`;
-                trendIndicator.appendChild(tooltip);
                 
                 totalTasksElement.appendChild(trendIndicator);
             }
