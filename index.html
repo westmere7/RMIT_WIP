@@ -445,6 +445,27 @@
             transform: none;
         }
         
+        .recap-button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #000054 0%, #000088 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 4px;
+            box-shadow: 0 4px 16px rgba(0, 0, 84, 0.35);
+            width: 100%;
+        }
+        
+        .recap-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 84, 0.45);
+            background: linear-gradient(135deg, #000066 0%, #0000aa 100%);
+        }
+        
         .task-campaign {
             color: #E61E2A;
             font-size: 0.75em;
@@ -1063,7 +1084,7 @@
                             <button id="clearFilters" class="clear-filters" disabled>Clear Filters</button>
                         </div>
                         <div class="filter-group">
-                            <button id="recapButton" class="clear-filters">Campaigns Recap</button>
+                            <button id="recapButton" class="recap-button">Campaigns Recap</button>
                         </div>
                     </div>
                 </div>
