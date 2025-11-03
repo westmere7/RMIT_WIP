@@ -501,11 +501,13 @@
             transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             border: 1px solid rgba(0, 0, 0, 0.05);
+            cursor: pointer;
         }
         
         .dashboard-status-item:hover {
             transform: translateX(4px);
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-color: #E61E2A;
         }
         
         .dashboard-status-label {
@@ -1383,6 +1385,12 @@
             sortedStatuses.forEach(([status, count], index) => {
                 const statusItem = document.createElement('div');
                 statusItem.className = 'dashboard-status-item';
+                statusItem.title = 'Click to filter by this status';
+                
+                // Add click handler to filter by status
+                statusItem.addEventListener('click', () => {
+                    setFilter('status', status);
+                });
                 
                 const label = document.createElement('div');
                 label.className = 'dashboard-status-label';
