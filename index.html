@@ -564,6 +564,85 @@
             line-height: 1;
         }
         
+        /* Workload level colors */
+        .workload-very-light {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(34, 197, 94, 0.02) 100%);
+            border-left-color: #22c55e;
+        }
+        
+        .workload-very-light:hover {
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.12);
+        }
+        
+        .workload-very-light .dashboard-stat-value {
+            color: #000000;
+        }
+        
+        .workload-light {
+            background: linear-gradient(135deg, rgba(132, 204, 22, 0.05) 0%, rgba(132, 204, 22, 0.02) 100%);
+            border-left-color: #84cc16;
+        }
+        
+        .workload-light:hover {
+            box-shadow: 0 8px 24px rgba(132, 204, 22, 0.12);
+        }
+        
+        .workload-light .dashboard-stat-value {
+            color: #000000;
+        }
+        
+        .workload-medium {
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.05) 0%, rgba(234, 179, 8, 0.02) 100%);
+            border-left-color: #eab308;
+        }
+        
+        .workload-medium:hover {
+            box-shadow: 0 8px 24px rgba(234, 179, 8, 0.12);
+        }
+        
+        .workload-medium .dashboard-stat-value {
+            color: #000000;
+        }
+        
+        .workload-med-high {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.05) 0%, rgba(249, 115, 22, 0.02) 100%);
+            border-left-color: #f97316;
+        }
+        
+        .workload-med-high:hover {
+            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.12);
+        }
+        
+        .workload-med-high .dashboard-stat-value {
+            color: #000000;
+        }
+        
+        .workload-high {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%);
+            border-left-color: #ef4444;
+        }
+        
+        .workload-high:hover {
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.12);
+        }
+        
+        .workload-high .dashboard-stat-value {
+            color: #000000;
+        }
+        
+        .workload-overloaded {
+            background: linear-gradient(135deg, rgba(230, 30, 42, 0.05) 0%, rgba(230, 30, 42, 0.02) 100%);
+            border-left-color: #E61E2A;
+        }
+        
+        .workload-overloaded:hover {
+            box-shadow: 0 8px 24px rgba(230, 30, 42, 0.12);
+        }
+        
+        .workload-overloaded .dashboard-stat-value {
+            color: #000000;
+        }
+        
         .dashboard-status-group {
             margin-bottom: 16px;
         }
@@ -1462,6 +1541,17 @@
             }, 16);
         }
         
+        function getWorkloadClass(loadText) {
+            const loadLower = loadText.toLowerCase().trim();
+            if (loadLower.includes('very light') || loadLower === 'very light') return 'workload-very-light';
+            if (loadLower.includes('light') && !loadLower.includes('very')) return 'workload-light';
+            if (loadLower.includes('med-high') || loadLower.includes('medium-high')) return 'workload-med-high';
+            if (loadLower.includes('medium') || loadLower === 'medium') return 'workload-medium';
+            if (loadLower.includes('high') && !loadLower.includes('med')) return 'workload-high';
+            if (loadLower.includes('overload')) return 'workload-overloaded';
+            return '';
+        }
+        
         function populateDashboard() {
             // Calculate statistics
             const totalTasks = allTasks.length;
@@ -1478,8 +1568,22 @@
             const totalTasksElement = document.getElementById('totalTasks');
             animateCount(totalTasksElement, 0, totalTasks, 1000);
             
-            // Set team load
-            document.getElementById('teamLoad').textContent = teamLoad;
+            // Set team load with color coding
+            const teamLoadElement = document.getElementById('teamLoad');
+            teamLoadElement.textContent = teamLoad;
+            
+            // Apply workload color class to the parent stat element
+            const teamLoadStat = teamLoadElement.closest('.dashboard-stat');
+            if (teamLoadStat) {
+                // Remove any existing workload classes
+                teamLoadStat.classList.remove('workload-very-light', 'workload-light', 'workload-medium', 
+                                             'workload-med-high', 'workload-high', 'workload-overloaded');
+                // Add the appropriate class based on the load
+                const workloadClass = getWorkloadClass(teamLoad);
+                if (workloadClass) {
+                    teamLoadStat.classList.add(workloadClass);
+                }
+            }
             
             // Populate status breakdown
             const statusBreakdownDiv = document.getElementById('statusBreakdown');
