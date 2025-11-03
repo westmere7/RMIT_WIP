@@ -1,37 +1,7 @@
 [
   {
-    "file": "W01_2029.xlsx",
-    "week": 1,
-    "year": 2029
-  },
-  {
-    "file": "W49_2028.xlsx",
-    "week": 49,
-    "year": 2028
-  },
-  {
-    "file": "W02_2027.xlsx",
-    "week": 2,
-    "year": 2027
-  },
-  {
-    "file": "W48_2026.xlsx",
-    "week": 48,
-    "year": 2026
-  },
-  {
-    "file": "W11_2026.xlsx",
-    "week": 11,
-    "year": 2026
-  },
-  {
-    "file": "W48_2025.xlsx",
-    "week": 48,
-    "year": 2025
-  },
-  {
-    "file": "W47_2025.xlsx",
-    "week": 47,
+    "file": "W45_2025.xlsx",
+    "week": 45,
     "year": 2025
   }
 ]
