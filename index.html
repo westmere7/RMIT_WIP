@@ -308,63 +308,53 @@
         
         .recap-card {
             background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 16px rgba(230, 30, 42, 0.25);
             border: none;
             color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
         }
         
         .recap-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(230, 30, 42, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(230, 30, 42, 0.35);
+        }
+        
+        .recap-card-left {
+            flex: 1;
+            min-width: 0;
         }
         
         .recap-campaign-name {
-            font-size: 1.2em;
+            font-size: 1em;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
             color: white;
             letter-spacing: 0.3px;
         }
         
-        .recap-person-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 14px;
-            margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            transition: all 0.2s ease;
-        }
-        
-        .recap-person-item:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: translateX(4px);
-        }
-        
-        .recap-person-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .recap-person-name {
-            font-size: 0.95em;
-            font-weight: 600;
-            color: white;
+        .recap-people-list {
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
         }
         
         .recap-task-count {
-            font-size: 1.1em;
+            font-size: 1.8em;
             font-weight: 800;
             color: white;
             background: rgba(255, 255, 255, 0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-            min-width: 40px;
+            padding: 8px 16px;
+            border-radius: 12px;
+            min-width: 50px;
             text-align: center;
+            flex-shrink: 0;
+            margin-left: 16px;
         }
         
         .filters {
@@ -1650,52 +1640,49 @@
             contentDiv.innerHTML = '';
             contentDiv.classList.add('individual-mode');
             
-            // Group tasks by campaign and then by person
+            // Group tasks by campaign
             const campaignData = {};
             
             allTasks.forEach(task => {
-                if (task.campaign && task.pic) {
+                if (task.campaign) {
                     if (!campaignData[task.campaign]) {
-                        campaignData[task.campaign] = {};
+                        campaignData[task.campaign] = {
+                            people: new Set(),
+                            taskCount: 0
+                        };
                     }
-                    if (!campaignData[task.campaign][task.pic]) {
-                        campaignData[task.campaign][task.pic] = 0;
+                    if (task.pic) {
+                        campaignData[task.campaign].people.add(task.pic);
                     }
-                    campaignData[task.campaign][task.pic]++;
+                    campaignData[task.campaign].taskCount++;
                 }
             });
             
             // Render each campaign card
             Object.keys(campaignData).sort().forEach(campaign => {
+                const data = campaignData[campaign];
                 const recapCard = document.createElement('div');
                 recapCard.className = 'recap-card';
+                
+                const cardLeft = document.createElement('div');
+                cardLeft.className = 'recap-card-left';
                 
                 const campaignName = document.createElement('div');
                 campaignName.className = 'recap-campaign-name';
                 campaignName.textContent = campaign;
-                recapCard.appendChild(campaignName);
+                cardLeft.appendChild(campaignName);
                 
-                // Sort people by task count (descending)
-                const sortedPeople = Object.entries(campaignData[campaign])
-                    .sort((a, b) => b[1] - a[1]);
+                const peopleList = document.createElement('div');
+                peopleList.className = 'recap-people-list';
+                peopleList.textContent = Array.from(data.people).sort().join(', ');
+                cardLeft.appendChild(peopleList);
                 
-                sortedPeople.forEach(([person, count]) => {
-                    const personItem = document.createElement('div');
-                    personItem.className = 'recap-person-item';
-                    
-                    const personName = document.createElement('div');
-                    personName.className = 'recap-person-name';
-                    personName.textContent = person;
-                    
-                    const taskCount = document.createElement('div');
-                    taskCount.className = 'recap-task-count';
-                    taskCount.textContent = count;
-                    
-                    personItem.appendChild(personName);
-                    personItem.appendChild(taskCount);
-                    recapCard.appendChild(personItem);
-                });
+                const taskCount = document.createElement('div');
+                taskCount.className = 'recap-task-count';
+                taskCount.textContent = data.taskCount;
                 
+                recapCard.appendChild(cardLeft);
+                recapCard.appendChild(taskCount);
                 contentDiv.appendChild(recapCard);
             });
         }
