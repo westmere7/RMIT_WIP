@@ -562,6 +562,67 @@
             font-weight: 800;
             color: #000000;
             line-height: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .trend-indicator {
+            font-size: 0.4em;
+            color: #9ca3af;
+            cursor: help;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .trend-indicator.up::before {
+            content: '?';
+        }
+        
+        .trend-indicator.down::before {
+            content: '?';
+        }
+        
+        .trend-indicator .tooltip {
+            visibility: hidden;
+            background-color: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 1.6em;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .trend-indicator .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        
+        .trend-indicator:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .dashboard-stat-value:hover .trend-indicator .tooltip {
+            visibility: visible;
+            opacity: 1;
         }
         
         /* Workload level colors */
@@ -1195,6 +1256,7 @@
         let filtersInitialized = false;
         let appVersion = 'Loading...';
         let isRecapMode = false;
+        let previousWeekTaskCount = null;
         
         // Load config file
         async function loadConfig() {
@@ -1318,11 +1380,54 @@
             });
         }
         
+        async function loadPreviousWeekTaskCount(currentFilename) {
+            const previousFilename = getPreviousWeek(currentFilename);
+            if (!previousFilename) {
+                previousWeekTaskCount = null;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`data/reports/${previousFilename}`, { method: 'HEAD' });
+                if (!response.ok) {
+                    // Previous week doesn't exist
+                    previousWeekTaskCount = null;
+                    return;
+                }
+                
+                // Load previous week's data
+                const dataResponse = await fetch(`data/reports/${previousFilename}`);
+                const arrayBuffer = await dataResponse.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                
+                // Count tasks from previous week
+                let taskCount = 0;
+                for (let i = 2; i < data.length; i++) {
+                    const row = data[i];
+                    if (row[0] || row[1]) { // Has campaign or task
+                        taskCount++;
+                    }
+                }
+                
+                previousWeekTaskCount = taskCount;
+            } catch (error) {
+                console.warn('Could not load previous week data:', error);
+                previousWeekTaskCount = null;
+            }
+        }
+        
         async function loadWeekData(filename) {
             try {
                 document.getElementById('loadingMessage').style.display = 'block';
                 document.getElementById('mainWrapper').style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'none';
+                
+                // Load previous week's task count first
+                await loadPreviousWeekTaskCount(filename);
                 
                 const response = await fetch(`data/reports/${filename}`);
                 if (!response.ok) {
@@ -1356,6 +1461,28 @@
                 return `Week ${weekNum}`;
             }
             return 'Week';
+        }
+        
+        function getPreviousWeek(currentFilename) {
+            // Parse current week filename: W45_2025.xlsx
+            const match = currentFilename.match(/W(\d+)_(\d+)\.xlsx/);
+            if (!match) return null;
+            
+            let week = parseInt(match[1]);
+            let year = parseInt(match[2]);
+            
+            // Calculate previous week
+            if (week === 1) {
+                // If current is W01, previous is W52 of previous year
+                week = 52;
+                year = year - 1;
+            } else {
+                week = week - 1;
+            }
+            
+            // Format with leading zero
+            const weekStr = week.toString().padStart(2, '0');
+            return `W${weekStr}_${year}.xlsx`;
         }
         
         async function initializeWeekSelector() {
@@ -1564,9 +1691,39 @@
                 }
             });
             
-            // Animate total tasks count
+            // Animate total tasks count and add trend indicator
             const totalTasksElement = document.getElementById('totalTasks');
-            animateCount(totalTasksElement, 0, totalTasks, 1000);
+            
+            // Clear previous content
+            totalTasksElement.innerHTML = '';
+            
+            // Add the count
+            const countSpan = document.createElement('span');
+            countSpan.textContent = '0';
+            totalTasksElement.appendChild(countSpan);
+            
+            // Animate the count
+            animateCount(countSpan, 0, totalTasks, 1000);
+            
+            // Add trend indicator if previous week data exists
+            if (previousWeekTaskCount !== null && previousWeekTaskCount !== totalTasks) {
+                const trendIndicator = document.createElement('span');
+                trendIndicator.className = 'trend-indicator';
+                
+                if (totalTasks > previousWeekTaskCount) {
+                    trendIndicator.classList.add('up');
+                } else {
+                    trendIndicator.classList.add('down');
+                }
+                
+                // Add tooltip
+                const tooltip = document.createElement('span');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = `Last week: ${previousWeekTaskCount} tasks`;
+                trendIndicator.appendChild(tooltip);
+                
+                totalTasksElement.appendChild(trendIndicator);
+            }
             
             // Set team load with color coding
             const teamLoadElement = document.getElementById('teamLoad');
