@@ -335,15 +335,16 @@
             align-items: center;
             padding: 10px 14px;
             margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
+            background: white;
             border-radius: 12px;
             transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         
         .recap-person-item:hover {
-            background: rgba(255, 255, 255, 0.25);
+            background: #f8f9fa;
             transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
         .recap-person-item:last-child {
@@ -353,14 +354,14 @@
         .recap-person-name {
             font-size: 0.95em;
             font-weight: 600;
-            color: white;
+            color: #2d3748;
         }
         
         .recap-task-count {
             font-size: 1.1em;
             font-weight: 800;
             color: white;
-            background: rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
             padding: 4px 12px;
             border-radius: 20px;
             min-width: 40px;
