@@ -1393,9 +1393,25 @@
                     }
                 }
                 
+                // Save current filter state and recap mode before resetting
+                const savedFilters = {
+                    pic: currentFilters.pic,
+                    status: currentFilters.status
+                };
+                const savedRecapMode = isRecapMode;
+                
                 // Reset and populate filter dropdowns
                 resetFilters();
                 populateFilters();
+                
+                // Restore filters if they still exist in the new data
+                restoreFilters(savedFilters);
+                
+                // Restore recap mode
+                isRecapMode = savedRecapMode;
+                if (isRecapMode) {
+                    updateFiltersState();
+                }
                 
                 // Setup filter event listeners (only once)
                 if (!filtersInitialized) {
@@ -1406,7 +1422,7 @@
                 // Populate dashboard
                 populateDashboard();
                 
-                // Render the content initially (grouped mode)
+                // Render the content with preserved filters/mode
                 applyFiltersAndRender();
                 
                 // Show content and filters, hide loading
@@ -1501,6 +1517,31 @@
             
             picFilter.innerHTML = '<option value="">All People</option>';
             statusFilter.innerHTML = '<option value="">All Statuses</option>';
+            
+            updateClearButton();
+        }
+        
+        function restoreFilters(savedFilters) {
+            const picFilter = document.getElementById('picFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            
+            // Check if saved PIC filter exists in new data
+            if (savedFilters.pic) {
+                const picOption = Array.from(picFilter.options).find(opt => opt.value === savedFilters.pic);
+                if (picOption) {
+                    currentFilters.pic = savedFilters.pic;
+                    picFilter.value = savedFilters.pic;
+                }
+            }
+            
+            // Check if saved status filter exists in new data
+            if (savedFilters.status) {
+                const statusOption = Array.from(statusFilter.options).find(opt => opt.value === savedFilters.status);
+                if (statusOption) {
+                    currentFilters.status = savedFilters.status;
+                    statusFilter.value = savedFilters.status;
+                }
+            }
             
             updateClearButton();
         }
