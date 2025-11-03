@@ -306,6 +306,67 @@
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
         }
         
+        .recap-card {
+            background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.3);
+            border: none;
+            color: white;
+        }
+        
+        .recap-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(230, 30, 42, 0.4);
+        }
+        
+        .recap-campaign-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: white;
+            letter-spacing: 0.3px;
+        }
+        
+        .recap-person-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .recap-person-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(4px);
+        }
+        
+        .recap-person-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .recap-person-name {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .recap-task-count {
+            font-size: 1.1em;
+            font-weight: 800;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            min-width: 40px;
+            text-align: center;
+        }
+        
         .filters {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -360,6 +421,12 @@
             outline: none;
             border-color: #E61E2A;
             box-shadow: 0 0 0 4px rgba(230, 30, 42, 0.15), 0 4px 12px rgba(230, 30, 42, 0.1);
+        }
+        
+        .filter-select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f0f0f0;
         }
         
         .clear-filters {
@@ -1005,6 +1072,9 @@
                         <div class="filter-group">
                             <button id="clearFilters" class="clear-filters" disabled>Clear Filters</button>
                         </div>
+                        <div class="filter-group">
+                            <button id="recapButton" class="clear-filters">Campaigns Recap</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1034,6 +1104,7 @@
         let currentWeekFile = '';
         let filtersInitialized = false;
         let appVersion = 'Loading...';
+        let isRecapMode = false;
         
         // Load config file
         async function loadConfig() {
@@ -1463,6 +1534,7 @@
             const picFilter = document.getElementById('picFilter');
             const statusFilter = document.getElementById('statusFilter');
             const clearButton = document.getElementById('clearFilters');
+            const recapButton = document.getElementById('recapButton');
             
             picFilter.addEventListener('change', () => {
                 currentFilters.pic = picFilter.value;
@@ -1484,6 +1556,33 @@
                 updateClearButton();
                 applyFiltersAndRender();
             });
+            
+            recapButton.addEventListener('click', () => {
+                isRecapMode = !isRecapMode;
+                updateFiltersState();
+                applyFiltersAndRender();
+            });
+        }
+        
+        function updateFiltersState() {
+            const picFilter = document.getElementById('picFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const clearButton = document.getElementById('clearFilters');
+            const recapButton = document.getElementById('recapButton');
+            
+            if (isRecapMode) {
+                // Disable filters in recap mode
+                picFilter.disabled = true;
+                statusFilter.disabled = true;
+                clearButton.disabled = true;
+                recapButton.textContent = 'Return to Full View';
+            } else {
+                // Enable filters in normal mode
+                picFilter.disabled = false;
+                statusFilter.disabled = false;
+                updateClearButton();
+                recapButton.textContent = 'Campaigns Recap';
+            }
         }
         
         function updateClearButton() {
@@ -1505,7 +1604,68 @@
             applyFiltersAndRender();
         }
         
+        function renderRecapView() {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = '';
+            contentDiv.classList.add('individual-mode');
+            
+            // Group tasks by campaign and then by person
+            const campaignData = {};
+            
+            allTasks.forEach(task => {
+                if (task.campaign && task.pic) {
+                    if (!campaignData[task.campaign]) {
+                        campaignData[task.campaign] = {};
+                    }
+                    if (!campaignData[task.campaign][task.pic]) {
+                        campaignData[task.campaign][task.pic] = 0;
+                    }
+                    campaignData[task.campaign][task.pic]++;
+                }
+            });
+            
+            // Render each campaign card
+            Object.keys(campaignData).sort().forEach(campaign => {
+                const recapCard = document.createElement('div');
+                recapCard.className = 'recap-card';
+                
+                const campaignName = document.createElement('div');
+                campaignName.className = 'recap-campaign-name';
+                campaignName.textContent = campaign;
+                recapCard.appendChild(campaignName);
+                
+                // Sort people by task count (descending)
+                const sortedPeople = Object.entries(campaignData[campaign])
+                    .sort((a, b) => b[1] - a[1]);
+                
+                sortedPeople.forEach(([person, count]) => {
+                    const personItem = document.createElement('div');
+                    personItem.className = 'recap-person-item';
+                    
+                    const personName = document.createElement('div');
+                    personName.className = 'recap-person-name';
+                    personName.textContent = person;
+                    
+                    const taskCount = document.createElement('div');
+                    taskCount.className = 'recap-task-count';
+                    taskCount.textContent = count;
+                    
+                    personItem.appendChild(personName);
+                    personItem.appendChild(taskCount);
+                    recapCard.appendChild(personItem);
+                });
+                
+                contentDiv.appendChild(recapCard);
+            });
+        }
+        
         function applyFiltersAndRender() {
+            // Check if we're in recap mode
+            if (isRecapMode) {
+                renderRecapView();
+                return;
+            }
+            
             // Filter tasks based on current filters
             let filteredTasks = allTasks;
             
