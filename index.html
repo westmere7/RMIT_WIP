@@ -1702,7 +1702,7 @@
                 }
             });
             
-            // Animate total tasks count and add trend indicator
+            // Set total tasks count and add trend indicator
             const totalTasksElement = document.getElementById('totalTasks');
             
             // Clear previous content
@@ -1710,11 +1710,8 @@
             
             // Add the count
             const countSpan = document.createElement('span');
-            countSpan.textContent = '0';
+            countSpan.textContent = totalTasks;
             totalTasksElement.appendChild(countSpan);
-            
-            // Animate the count
-            animateCount(countSpan, 0, totalTasks, 1000);
             
             // Add trend indicator if previous week data exists
             if (previousWeekTaskCount !== null && previousWeekTaskCount !== totalTasks) {
@@ -1782,16 +1779,11 @@
                 
                 const countElement = document.createElement('div');
                 countElement.className = 'dashboard-status-count';
-                countElement.textContent = '0';
+                countElement.textContent = count;
                 
                 statusItem.appendChild(label);
                 statusItem.appendChild(countElement);
                 statusBreakdownDiv.appendChild(statusItem);
-                
-                // Animate count with staggered delay
-                setTimeout(() => {
-                    animateCount(countElement, 0, count, 800);
-                }, index * 100);
             });
         }
         
@@ -1884,6 +1876,7 @@
                 picFilter.value = '';
                 statusFilter.value = '';
                 updateClearButton();
+                populateDashboard(); // Refresh dashboard to remove highlighting
                 applyFiltersAndRender();
             });
             
