@@ -724,6 +724,21 @@
             border-color: #E61E2A;
         }
         
+        .dashboard-status-item.selected {
+            background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
+            border-color: #E61E2A;
+            box-shadow: 0 4px 16px rgba(230, 30, 42, 0.3);
+            transform: translateX(4px);
+        }
+        
+        .dashboard-status-item.selected .dashboard-status-label {
+            color: white;
+        }
+        
+        .dashboard-status-item.selected .dashboard-status-count {
+            color: white;
+        }
+        
         .dashboard-status-label {
             font-size: 0.85em;
             color: #4a5568;
@@ -1744,11 +1759,22 @@
                 const statusItem = document.createElement('div');
                 statusItem.className = 'dashboard-status-item';
                 statusItem.title = 'Click to filter by this status';
+                statusItem.dataset.status = status;
                 
-                // Add click handler to filter by status
+                // Add click handler to toggle filter by status
                 statusItem.addEventListener('click', () => {
-                    setFilter('status', status);
+                    // Toggle: if already selected, clear it; otherwise, set it
+                    if (currentFilters.status === status) {
+                        setFilter('status', '');
+                    } else {
+                        setFilter('status', status);
+                    }
                 });
+                
+                // Highlight if this status is currently selected
+                if (currentFilters.status === status) {
+                    statusItem.classList.add('selected');
+                }
                 
                 const label = document.createElement('div');
                 label.className = 'dashboard-status-label';
@@ -1905,6 +1931,7 @@
                 document.getElementById('picFilter').value = value;
             }
             updateClearButton();
+            populateDashboard(); // Refresh dashboard to update highlighting
             applyFiltersAndRender();
         }
         
