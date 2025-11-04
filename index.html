@@ -1768,8 +1768,8 @@
                     }
                 });
                 
-                // Highlight if this status is currently selected
-                if (currentFilters.status === status) {
+                // Highlight if this status is currently selected (but not in recap mode)
+                if (currentFilters.status === status && !isRecapMode) {
                     statusItem.classList.add('selected');
                 }
                 
