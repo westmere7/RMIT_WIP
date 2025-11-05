@@ -246,6 +246,15 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
+        .status-badge.no-click {
+            cursor: default;
+        }
+        
+        .status-badge.no-click:hover {
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
         .status-done {
             background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%);
             color: #22c55e;
@@ -304,6 +313,15 @@
         .assignee:hover {
             transform: scale(1.05);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+        
+        .assignee.no-click {
+            cursor: default;
+        }
+        
+        .assignee.no-click:hover {
+            transform: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
         .recap-card {
@@ -722,6 +740,32 @@
             transform: translateX(4px);
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
             border-color: #E61E2A;
+        }
+        
+        .dashboard-status-item.selected {
+            background: linear-gradient(135deg, #E61E2A 0%, #c71824 100%);
+            border-color: #E61E2A;
+            box-shadow: 0 4px 16px rgba(230, 30, 42, 0.3);
+            transform: translateX(4px);
+        }
+        
+        .dashboard-status-item.selected .dashboard-status-label {
+            color: white;
+        }
+        
+        .dashboard-status-item.selected .dashboard-status-count {
+            color: white;
+        }
+        
+        .dashboard-status-item.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .dashboard-status-item.disabled:hover {
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-color: rgba(0, 0, 0, 0.05);
         }
         
         .dashboard-status-label {
@@ -1687,7 +1731,7 @@
                 }
             });
             
-            // Animate total tasks count and add trend indicator
+            // Set total tasks count and add trend indicator
             const totalTasksElement = document.getElementById('totalTasks');
             
             // Clear previous content
@@ -1695,11 +1739,8 @@
             
             // Add the count
             const countSpan = document.createElement('span');
-            countSpan.textContent = '0';
+            countSpan.textContent = totalTasks;
             totalTasksElement.appendChild(countSpan);
-            
-            // Animate the count
-            animateCount(countSpan, 0, totalTasks, 1000);
             
             // Add trend indicator if previous week data exists
             if (previousWeekTaskCount !== null && previousWeekTaskCount !== totalTasks) {
@@ -1743,12 +1784,34 @@
             sortedStatuses.forEach(([status, count], index) => {
                 const statusItem = document.createElement('div');
                 statusItem.className = 'dashboard-status-item';
-                statusItem.title = 'Click to filter by this status';
+                statusItem.dataset.status = status;
                 
-                // Add click handler to filter by status
+                // Add click handler to toggle filter by status
                 statusItem.addEventListener('click', () => {
-                    setFilter('status', status);
+                    // Disable filtering when in recap mode
+                    if (isRecapMode) {
+                        return;
+                    }
+                    
+                    // Toggle: if already selected, clear it; otherwise, set it
+                    if (currentFilters.status === status) {
+                        setFilter('status', '');
+                    } else {
+                        setFilter('status', status);
+                    }
                 });
+                
+                // Apply appropriate styling based on mode
+                if (isRecapMode) {
+                    statusItem.classList.add('disabled');
+                    statusItem.title = status;
+                } else {
+                    statusItem.title = 'Click to filter by this status';
+                    // Highlight if this status is currently selected
+                    if (currentFilters.status === status) {
+                        statusItem.classList.add('selected');
+                    }
+                }
                 
                 const label = document.createElement('div');
                 label.className = 'dashboard-status-label';
@@ -1756,16 +1819,11 @@
                 
                 const countElement = document.createElement('div');
                 countElement.className = 'dashboard-status-count';
-                countElement.textContent = '0';
+                countElement.textContent = count;
                 
                 statusItem.appendChild(label);
                 statusItem.appendChild(countElement);
                 statusBreakdownDiv.appendChild(statusItem);
-                
-                // Animate count with staggered delay
-                setTimeout(() => {
-                    animateCount(countElement, 0, count, 800);
-                }, index * 100);
             });
         }
         
@@ -1858,6 +1916,7 @@
                 picFilter.value = '';
                 statusFilter.value = '';
                 updateClearButton();
+                populateDashboard(); // Refresh dashboard to remove highlighting
                 applyFiltersAndRender();
             });
             
@@ -1905,6 +1964,7 @@
                 document.getElementById('picFilter').value = value;
             }
             updateClearButton();
+            populateDashboard(); // Refresh dashboard to update highlighting
             applyFiltersAndRender();
         }
         
@@ -2045,24 +2105,34 @@
                     if (task.status) {
                         const statusBadge = document.createElement('span');
                         statusBadge.className = 'status-badge ' + getStatusClass(task.status);
+                        if (isRecapMode) {
+                            statusBadge.classList.add('no-click');
+                        }
                         statusBadge.textContent = task.status;
-                        statusBadge.title = 'Click to filter by this status';
-                        statusBadge.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            setFilter('status', task.status);
-                        });
+                        statusBadge.title = isRecapMode ? task.status : 'Click to filter by this status';
+                        if (!isRecapMode) {
+                            statusBadge.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                setFilter('status', task.status);
+                            });
+                        }
                         taskRight.appendChild(statusBadge);
                     }
                     
                     if (task.pic) {
                         const assignee = document.createElement('span');
                         assignee.className = 'assignee';
+                        if (isRecapMode) {
+                            assignee.classList.add('no-click');
+                        }
                         assignee.textContent = task.pic;
-                        assignee.title = 'Click to filter by this person';
-                        assignee.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            setFilter('pic', task.pic);
-                        });
+                        assignee.title = isRecapMode ? task.pic : 'Click to filter by this person';
+                        if (!isRecapMode) {
+                            assignee.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                setFilter('pic', task.pic);
+                            });
+                        }
                         taskRight.appendChild(assignee);
                     }
                     
@@ -2113,24 +2183,34 @@
                     if (task.status) {
                         const statusBadge = document.createElement('span');
                         statusBadge.className = 'status-badge ' + getStatusClass(task.status);
+                        if (isRecapMode) {
+                            statusBadge.classList.add('no-click');
+                        }
                         statusBadge.textContent = task.status;
-                        statusBadge.title = 'Click to filter by this status';
-                        statusBadge.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            setFilter('status', task.status);
-                        });
+                        statusBadge.title = isRecapMode ? task.status : 'Click to filter by this status';
+                        if (!isRecapMode) {
+                            statusBadge.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                setFilter('status', task.status);
+                            });
+                        }
                         taskRight.appendChild(statusBadge);
                     }
                     
                     if (task.pic) {
                         const assignee = document.createElement('span');
                         assignee.className = 'assignee';
+                        if (isRecapMode) {
+                            assignee.classList.add('no-click');
+                        }
                         assignee.textContent = task.pic;
-                        assignee.title = 'Click to filter by this person';
-                        assignee.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            setFilter('pic', task.pic);
-                        });
+                        assignee.title = isRecapMode ? task.pic : 'Click to filter by this person';
+                        if (!isRecapMode) {
+                            assignee.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                setFilter('pic', task.pic);
+                            });
+                        }
                         taskRight.appendChild(assignee);
                     }
                     
