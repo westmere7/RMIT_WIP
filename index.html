@@ -793,7 +793,6 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 12px 24px;
-            text-align: center;
             color: #718096;
             font-size: 0.75em;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
@@ -803,6 +802,20 @@
             left: 0;
             right: 0;
             z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .footer-left {
+            text-align: left;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .footer-right {
+            text-align: right;
         }
         
         @media (max-width: 1400px) {
@@ -1205,6 +1218,13 @@
             .footer {
                 padding: 10px 12px;
                 font-size: 0.7em;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .footer-left, .footer-right {
+                text-align: left;
             }
         }
     </style>
@@ -1276,11 +1296,16 @@
         </div>
         
         <div class="footer" id="footer">
-            <span id="footerText">Loading...</span>
-            <span style="margin: 0 8px; color: #cbd5e0;">|</span>
-            <span style="color: #4a5568; font-weight: 600;">Built by NTD</span>
-            <span style="margin: 0 8px; color: #cbd5e0;">|</span>
-            <span style="color: #718096;">v<span id="appVersion">...</span></span>
+            <div class="footer-left">
+                Ready for what's next...week
+            </div>
+            <div class="footer-right">
+                <span id="footerText">Loading...</span>
+                <span style="margin: 0 8px; color: #cbd5e0;">|</span>
+                <span style="color: #4a5568; font-weight: 600;">Built by NTD</span>
+                <span style="margin: 0 8px; color: #cbd5e0;">|</span>
+                <span style="color: #718096;">v<span id="appVersion">...</span></span>
+            </div>
         </div>
     </div>
 
