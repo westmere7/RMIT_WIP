@@ -1242,41 +1242,31 @@
             }
         }
 
-        /* Highlight FX - Modern Gradient Overlay */
+        /* Highlight FX - Animated Header Gradient */
         .project-section.highlight-fx {
-            border-color: transparent !important;
-            position: relative;
-            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.15);
+            /* No border/shadow on the card itself */
+            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.15);
         }
 
-        .project-section.highlight-fx::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 20px;
-            padding: 3px;
-            /* Border thickness */
-            background: linear-gradient(135deg,
-                    #0EA5E9,
-                    /* Sky Blue */
-                    #8B5CF6,
-                    /* Violet */
-                    #D946EF,
-                    /* Fuchsia */
-                    #8B5CF6,
-                    #0EA5E9);
-            background-size: 200% 200%;
-            -webkit-mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            pointer-events: none;
-            z-index: 10;
-            animation: gradient-shine 3s linear infinite;
+        .project-section.highlight-fx h2 {
+            background: linear-gradient(90deg,
+                    #E61E2A 0%,
+                    #ff5e69 25%,
+                    #E61E2A 50%,
+                    #c71824 75%,
+                    #E61E2A 100%);
+            background-size: 200% 100%;
+            animation: header-shine 3s linear infinite;
+        }
+
+        @keyframes header-shine {
+            0% {
+                background-position: 100% 0;
+            }
+
+            100% {
+                background-position: -100% 0;
+            }
         }
 
         @keyframes gradient-shine {
