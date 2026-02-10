@@ -154,6 +154,7 @@
         }
 
         .project-section {
+            position: relative;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
@@ -196,7 +197,6 @@
 
         .task-card:hover {
             transform: translateY(-2px);
-            border: 2px solid #E61E2A;
             box-shadow: 0 8px 24px rgba(230, 30, 42, 0.15);
         }
 
@@ -1242,54 +1242,35 @@
             }
         }
 
-        /* Highlight FX - Moving Dotted Border */
+        /* Highlight FX - SVG Overlay */
         .project-section.highlight-fx {
-            position: relative;
-            background: rgba(255, 255, 255, 0.95);
-            /* Keep background solid */
-            border: none !important;
-            /* Remove standard border */
+            border-color: transparent !important;
             box-shadow: 0 8px 32px rgba(230, 30, 42, 0.15);
-            border-radius: 20px;
-            /* Match standard radius */
-            --border-color: #E61E2A;
-            --border-width: 3px;
-            --dash-size: 15px;
-            --gap-size: 10px;
-            background-image:
-                linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
-                linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
-                linear-gradient(0deg, var(--border-color) 50%, transparent 50%),
-                linear-gradient(0deg, var(--border-color) 50%, transparent 50%);
-            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-            background-size:
-                calc(var(--dash-size) + var(--gap-size)) var(--border-width),
-                calc(var(--dash-size) + var(--gap-size)) var(--border-width),
-                var(--border-width) calc(var(--dash-size) + var(--gap-size)),
-                var(--border-width) calc(var(--dash-size) + var(--gap-size));
-            background-position:
-                0 0,
-                0 100%,
-                0 0,
-                100% 0;
-            animation: border-dance 1s infinite linear;
         }
 
-        @keyframes border-dance {
-            0% {
-                background-position:
-                    0 0,
-                    100% 100%,
-                    0 100%,
-                    100% 0;
-            }
+        .highlight-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
 
-            100% {
-                background-position:
-                    calc(var(--dash-size) + var(--gap-size)) 0,
-                    calc(100% - (var(--dash-size) + var(--gap-size))) 100%,
-                    0 calc(100% - (var(--dash-size) + var(--gap-size))),
-                    100% calc(var(--dash-size) + var(--gap-size));
+        .highlight-svg rect {
+            fill: none;
+            stroke: #E61E2A;
+            stroke-width: 2.5;
+            stroke-dasharray: 6 8;
+            /* Finer dots */
+            stroke-linecap: round;
+            animation: dash-animation 1s linear infinite;
+        }
+
+        @keyframes dash-animation {
+            to {
+                stroke-dashoffset: -28;
             }
         }
     </style>
@@ -2275,6 +2256,23 @@
                 const hasHighlight = groupedTasks[campaign].some(t => t.customFX === 'Highlight');
                 if (hasHighlight) {
                     section.classList.add('highlight-fx');
+                    // Inject SVG overlay
+                    const svgNS = "http://www.w3.org/2000/svg";
+                    const svg = document.createElementNS(svgNS, "svg");
+                    svg.setAttribute("class", "highlight-svg");
+                    svg.setAttribute("width", "100%");
+                    svg.setAttribute("height", "100%");
+
+                    const rect = document.createElementNS(svgNS, "rect");
+                    rect.setAttribute("x", "0");
+                    rect.setAttribute("y", "0");
+                    rect.setAttribute("width", "100%");
+                    rect.setAttribute("height", "100%");
+                    rect.setAttribute("rx", "20"); // Match border-radius
+                    rect.setAttribute("ry", "20");
+
+                    svg.appendChild(rect);
+                    section.appendChild(svg);
                 }
 
                 const header = document.createElement('h2');
