@@ -1233,39 +1233,7 @@
                 margin-bottom: 8px;
             }
 
-            .task-card:hover {
-                transform: translateY(-2px);
-                /* border: 2px solid #E61E2A; Removed hover outline */
-                box-shadow: 0 8px 24px rgba(230, 30, 42, 0.15);
-            }
-
-            .task-card:last-child {
-                margin-bottom: 0;
-            }
-
-            .task-left {
-                flex: 1;
-                min-width: 0;
-            }
-
-            .task-title {
-                font-weight: 600;
-                color: #2d3748;
-                margin-bottom: 4px;
-                font-size: 0.9em;
-                line-height: 1.4;
-            }
-
-            .task-details {
-                color: #718096;
-                font-size: 0.8em;
-            }
-
             .task-right {
-                display: flex;
-                gap: 6px;
-                align-items: center;
-                flex-shrink: 0;
                 width: 100%;
             }
 
@@ -1274,13 +1242,56 @@
             }
         }
 
-        /* Highlight FX - Moving Dotted Border (SVG) */
+        /* Highlight FX - Moving Dotted Border */
         .project-section.highlight-fx {
             position: relative;
             background: rgba(255, 255, 255, 0.95);
+            /* Keep background solid */
             border: none !important;
+            /* Remove standard border */
             box-shadow: 0 8px 32px rgba(230, 30, 42, 0.15);
             border-radius: 20px;
+            /* Match standard radius */
+            --border-color: #E61E2A;
+            --border-width: 3px;
+            --dash-size: 15px;
+            --gap-size: 10px;
+            background-image:
+                linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
+                linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
+                linear-gradient(0deg, var(--border-color) 50%, transparent 50%),
+                linear-gradient(0deg, var(--border-color) 50%, transparent 50%);
+            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+            background-size:
+                calc(var(--dash-size) + var(--gap-size)) var(--border-width),
+                calc(var(--dash-size) + var(--gap-size)) var(--border-width),
+                var(--border-width) calc(var(--dash-size) + var(--gap-size)),
+                var(--border-width) calc(var(--dash-size) + var(--gap-size));
+            background-position:
+                0 0,
+                0 100%,
+                0 0,
+                100% 0;
+            animation: border-dance 1s infinite linear;
+        }
+
+        @keyframes border-dance {
+            0% {
+                background-position:
+                    0 0,
+                    100% 100%,
+                    0 100%,
+                    100% 0;
+            }
+
+            100% {
+                background-position:
+                    calc(var(--dash-size) + var(--gap-size)) 0,
+                    calc(100% - (var(--dash-size) + var(--gap-size))) 100%,
+                    0 calc(100% - (var(--dash-size) + var(--gap-size))),
+                    100% calc(var(--dash-size) + var(--gap-size));
+            }
+        }
     </style>
 </head>
 
