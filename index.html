@@ -1242,6 +1242,31 @@
                 font-size: 0.7em;
             }
         }
+
+        /* Highlight FX */
+        .project-section.highlight-fx {
+            border: 3px solid transparent !important;
+            background:
+                linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)) padding-box,
+                linear-gradient(135deg, #E61E2A, #000054, #E61E2A, #000054) border-box;
+            background-size: 300% 300%;
+            animation: gradient-move 4s ease infinite;
+            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.15);
+        }
+
+        @keyframes gradient-move {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
     </style>
 </head>
 
@@ -1682,7 +1707,8 @@
                             task: (row[1] || '').trim(),
                             pic: (row[2] || '').toString().split('/').map(p => p.trim()).filter(p => p.length > 0),
                             status: (row[3] || '').trim(),
-                            details: (row[4] || '').trim()
+                            details: (row[4] || '').trim(),
+                            customFX: (row[5] || '').trim()
                         });
                     }
                 }
@@ -2215,6 +2241,12 @@
             Object.keys(groupedTasks).forEach(campaign => {
                 const section = document.createElement('div');
                 section.className = 'project-section';
+
+                // Check if any task in this campaign has "Highlight" in CustomFX
+                const hasHighlight = groupedTasks[campaign].some(t => t.customFX === 'Highlight');
+                if (hasHighlight) {
+                    section.classList.add('highlight-fx');
+                }
 
                 const header = document.createElement('h2');
                 header.textContent = campaign;
