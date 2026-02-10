@@ -1643,7 +1643,7 @@
                         allTasks.push({
                             campaign: (row[0] || '').trim(),
                             task: (row[1] || '').trim(),
-                            pic: (row[2] || '').trim(),
+                            pic: (row[2] || '').toString().split('/').map(p => p.trim()).filter(p => p.length > 0),
                             status: (row[3] || '').trim(),
                             details: (row[4] || '').trim()
                         });
@@ -1869,7 +1869,7 @@
         
         function populateFilters() {
             // Get unique PICs and statuses
-            const pics = [...new Set(allTasks.map(t => t.pic).filter(p => p))].sort();
+            const pics = [...new Set(allTasks.flatMap(t => t.pic))].sort();
             const statuses = [...new Set(allTasks.map(t => t.status).filter(s => s))].sort();
             
             const picFilter = document.getElementById('picFilter');
@@ -1984,8 +1984,8 @@
                             taskCount: 0
                         };
                     }
-                    if (task.pic) {
-                        campaignData[task.campaign].people.add(task.pic);
+                    if (task.pic && task.pic.length > 0) {
+                        task.pic.forEach(p => campaignData[task.campaign].people.add(p));
                     }
                     campaignData[task.campaign].taskCount++;
                 }
@@ -2031,7 +2031,7 @@
             let filteredTasks = allTasks;
             
             if (currentFilters.pic) {
-                filteredTasks = filteredTasks.filter(t => t.pic === currentFilters.pic);
+                filteredTasks = filteredTasks.filter(t => t.pic.includes(currentFilters.pic));
             }
             
             if (currentFilters.status) {
@@ -2119,21 +2119,23 @@
                         taskRight.appendChild(statusBadge);
                     }
                     
-                    if (task.pic) {
-                        const assignee = document.createElement('span');
-                        assignee.className = 'assignee';
-                        if (isRecapMode) {
-                            assignee.classList.add('no-click');
-                        }
-                        assignee.textContent = task.pic;
-                        assignee.title = isRecapMode ? task.pic : 'Click to filter by this person';
-                        if (!isRecapMode) {
-                            assignee.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                setFilter('pic', task.pic);
-                            });
-                        }
-                        taskRight.appendChild(assignee);
+                    if (task.pic && task.pic.length > 0) {
+                        task.pic.forEach(person => {
+                            const assignee = document.createElement('span');
+                            assignee.className = 'assignee';
+                            if (isRecapMode) {
+                                assignee.classList.add('no-click');
+                            }
+                            assignee.textContent = person;
+                            assignee.title = isRecapMode ? person : 'Click to filter by this person';
+                            if (!isRecapMode) {
+                                assignee.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    setFilter('pic', person);
+                                });
+                            }
+                            taskRight.appendChild(assignee);
+                        });
                     }
                     
                     taskCard.appendChild(taskLeft);
@@ -2197,21 +2199,23 @@
                         taskRight.appendChild(statusBadge);
                     }
                     
-                    if (task.pic) {
-                        const assignee = document.createElement('span');
-                        assignee.className = 'assignee';
-                        if (isRecapMode) {
-                            assignee.classList.add('no-click');
-                        }
-                        assignee.textContent = task.pic;
-                        assignee.title = isRecapMode ? task.pic : 'Click to filter by this person';
-                        if (!isRecapMode) {
-                            assignee.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                setFilter('pic', task.pic);
-                            });
-                        }
-                        taskRight.appendChild(assignee);
+                    if (task.pic && task.pic.length > 0) {
+                        task.pic.forEach(person => {
+                            const assignee = document.createElement('span');
+                            assignee.className = 'assignee';
+                            if (isRecapMode) {
+                                assignee.classList.add('no-click');
+                            }
+                            assignee.textContent = person;
+                            assignee.title = isRecapMode ? person : 'Click to filter by this person';
+                            if (!isRecapMode) {
+                                assignee.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    setFilter('pic', person);
+                                });
+                            }
+                            taskRight.appendChild(assignee);
+                        });
                     }
                     
                     taskCard.appendChild(taskLeft);
