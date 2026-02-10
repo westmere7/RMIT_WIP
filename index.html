@@ -190,13 +190,19 @@
             align-items: center;
             gap: 12px;
             transition: transform 0.15s ease, box-shadow 0.15s ease;
-            border: 2px solid transparent;
+            border-top: 2px solid transparent;
+            border-right: 2px solid transparent;
+            border-bottom: 2px solid transparent;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            /* Clickable */
         }
 
         .task-card:hover {
             transform: translateY(-2px);
-            border: 2px solid #E61E2A;
+            border-top: 2px solid #E61E2A;
+            border-right: 2px solid #E61E2A;
+            border-bottom: 2px solid #E61E2A;
             box-shadow: 0 8px 24px rgba(230, 30, 42, 0.15);
         }
 
@@ -1242,29 +1248,42 @@
             }
         }
 
-        /* Highlight FX */
+        /* Highlight FX - Moving Dotted Border */
         .project-section.highlight-fx {
-            border: 4px solid transparent !important;
+            position: relative;
+            background: #ffffff;
+            /* Ensure background is opaque */
             border-radius: 24px;
-            background:
-                linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)) padding-box,
-                linear-gradient(115deg, #E61E2A, #ff8a90, #E61E2A, #b30000) border-box;
-            background-size: 200% 200%;
-            animation: gradient-move 2.5s linear infinite;
-            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.25);
+            /* Create space for the border */
+            border: 4px solid transparent;
+            background-clip: padding-box;
+            /* Background only inside padding */
+            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.15);
         }
 
-        @keyframes gradient-move {
-            0% {
-                background-position: 0% 50%;
-            }
+        .project-section.highlight-fx::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            bottom: -4px;
+            left: -4px;
+            z-index: -1;
+            border-radius: 24px;
+            background-image:
+                linear-gradient(90deg, #E61E2A 50%, transparent 50%),
+                linear-gradient(90deg, #E61E2A 50%, transparent 50%),
+                linear-gradient(0deg, #E61E2A 50%, transparent 50%),
+                linear-gradient(0deg, #E61E2A 50%, transparent 50%);
+            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+            background-size: 20px 4px, 20px 4px, 4px 20px, 4px 20px;
+            background-position: 0 0, 0 100%, 0 0, 100% 0;
+            animation: dash-move 12s linear infinite;
+        }
 
-            50% {
-                background-position: 100% 50%;
-            }
-
+        @keyframes dash-move {
             100% {
-                background-position: 0% 50%;
+                background-position: 100% 0, -100% 100%, 0 100%, 100% -100%;
             }
         }
     </style>
@@ -2158,6 +2177,10 @@
             tasks.forEach(task => {
                 const taskCard = document.createElement('div');
                 taskCard.className = 'task-card';
+                // Add click listener
+                taskCard.addEventListener('click', () => {
+                    window.open('https://rmit.monday.com/boards/1967557512', '_blank');
+                });
 
                 const taskLeft = document.createElement('div');
                 taskLeft.className = 'task-left';
@@ -2258,6 +2281,10 @@
                 groupedTasks[campaign].forEach(task => {
                     const taskCard = document.createElement('div');
                     taskCard.className = 'task-card';
+                    // Add click listener
+                    taskCard.addEventListener('click', () => {
+                        window.open('https://rmit.monday.com/boards/1967557512', '_blank');
+                    });
 
                     const taskLeft = document.createElement('div');
                     taskLeft.className = 'task-left';
