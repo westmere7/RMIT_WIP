@@ -1242,35 +1242,54 @@
             }
         }
 
-        /* Highlight FX - SVG Overlay */
+        /* Highlight FX - Modern Gradient Overlay */
         .project-section.highlight-fx {
             border-color: transparent !important;
-            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.15);
+            position: relative;
+            box-shadow: 0 8px 32px rgba(245, 158, 11, 0.15);
         }
 
-        .highlight-svg {
+        .project-section.highlight-fx::after {
+            content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
+            border-radius: 20px;
+            padding: 3px;
+            /* Border thickness */
+            background: linear-gradient(135deg,
+                    #F59E0B,
+                    /* Amber 500 */
+                    #FCD34D,
+                    /* Amber 300 */
+                    #FFFFFF,
+                    /* White highlight */
+                    #FCD34D,
+                    #F59E0B);
+            background-size: 200% 200%;
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            mask-composite: exclude;
             pointer-events: none;
             z-index: 10;
+            animation: gradient-shine 3s linear infinite;
         }
 
-        .highlight-svg rect {
-            fill: none;
-            stroke: #E61E2A;
-            stroke-width: 4;
-            stroke-dasharray: 8 10;
-            stroke-linecap: round;
-            animation: dash-animation 1s linear infinite;
-        }
+        @keyframes gradient-shine {
+            0% {
+                background-position: 0% 50%;
+            }
 
-        @keyframes dash-animation {
-            to {
-                stroke-dashoffset: -36;
-                /* 2 * (8 + 10) for seamless loop */
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
             }
         }
     </style>
@@ -2252,27 +2271,9 @@
                 const section = document.createElement('div');
                 section.className = 'project-section';
 
-                // Check if any task in this campaign has "Highlight" in CustomFX
                 const hasHighlight = groupedTasks[campaign].some(t => t.customFX === 'Highlight');
                 if (hasHighlight) {
                     section.classList.add('highlight-fx');
-                    // Inject SVG overlay
-                    const svgNS = "http://www.w3.org/2000/svg";
-                    const svg = document.createElementNS(svgNS, "svg");
-                    svg.setAttribute("class", "highlight-svg");
-                    svg.setAttribute("width", "100%");
-                    svg.setAttribute("height", "100%");
-
-                    const rect = document.createElementNS(svgNS, "rect");
-                    rect.setAttribute("x", "2");
-                    rect.setAttribute("y", "2");
-                    rect.style.width = "calc(100% - 4px)";
-                    rect.style.height = "calc(100% - 4px)";
-                    rect.setAttribute("rx", "18"); // Match border-radius minus offset
-                    rect.setAttribute("ry", "18");
-
-                    svg.appendChild(rect);
-                    section.appendChild(svg);
                 }
 
                 const header = document.createElement('h2');
