@@ -1242,29 +1242,54 @@
             }
         }
 
-        /* Highlight FX */
+        /* Highlight FX - Moving Dotted Border */
         .project-section.highlight-fx {
-            border: 4px solid transparent !important;
-            border-radius: 24px;
-            background:
-                linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)) padding-box,
-                linear-gradient(115deg, #E61E2A, #ff8a90, #E61E2A, #b30000) border-box;
-            background-size: 200% 200%;
-            animation: gradient-move 2.5s linear infinite;
-            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.25);
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            /* Keep background solid */
+            border: none !important;
+            /* Remove standard border */
+            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.15);
+            border-radius: 20px;
+            /* Match standard radius */
+            --border-color: #E61E2A;
+            --border-width: 3px;
+            --dash-size: 15px;
+            --gap-size: 10px;
+            background-image:
+                linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
+                linear-gradient(90deg, var(--border-color) 50%, transparent 50%),
+                linear-gradient(0deg, var(--border-color) 50%, transparent 50%),
+                linear-gradient(0deg, var(--border-color) 50%, transparent 50%);
+            background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+            background-size:
+                calc(var(--dash-size) + var(--gap-size)) var(--border-width),
+                calc(var(--dash-size) + var(--gap-size)) var(--border-width),
+                var(--border-width) calc(var(--dash-size) + var(--gap-size)),
+                var(--border-width) calc(var(--dash-size) + var(--gap-size));
+            background-position:
+                0 0,
+                0 100%,
+                0 0,
+                100% 0;
+            animation: border-dance 1s infinite linear;
         }
 
-        @keyframes gradient-move {
+        @keyframes border-dance {
             0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
+                background-position:
+                    0 0,
+                    100% 100%,
+                    0 100%,
+                    100% 0;
             }
 
             100% {
-                background-position: 0% 50%;
+                background-position:
+                    calc(var(--dash-size) + var(--gap-size)) 0,
+                    calc(100% - (var(--dash-size) + var(--gap-size))) 100%,
+                    0 calc(100% - (var(--dash-size) + var(--gap-size))),
+                    100% calc(var(--dash-size) + var(--gap-size));
             }
         }
     </style>
@@ -2158,6 +2183,10 @@
             tasks.forEach(task => {
                 const taskCard = document.createElement('div');
                 taskCard.className = 'task-card';
+                taskCard.style.cursor = 'pointer';
+                taskCard.onclick = function () {
+                    window.open('https://rmit.monday.com/boards/1967557512', '_blank');
+                };
 
                 const taskLeft = document.createElement('div');
                 taskLeft.className = 'task-left';
@@ -2258,6 +2287,10 @@
                 groupedTasks[campaign].forEach(task => {
                     const taskCard = document.createElement('div');
                     taskCard.className = 'task-card';
+                    taskCard.style.cursor = 'pointer';
+                    taskCard.onclick = function () {
+                        window.open('https://rmit.monday.com/boards/1967557512', '_blank');
+                    };
 
                     const taskLeft = document.createElement('div');
                     taskLeft.className = 'task-left';
