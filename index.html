@@ -1743,7 +1743,7 @@
                             pic: (row[2] || '').toString().split('/').map(p => p.trim()).filter(p => p.length > 0),
                             status: (row[3] || '').trim(),
                             details: (row[4] || '').trim(),
-                            customFX: (row[5] || '').trim()
+                            customFX: row.slice(5).filter(Boolean).map(String).join(' ').trim()
                         });
                     }
                 }
@@ -2281,7 +2281,9 @@
                 const section = document.createElement('div');
                 section.className = 'project-section';
 
-                const hasHighlight = groupedTasks[campaign].some(t => t.customFX === 'Highlight');
+                const hasHighlight = groupedTasks[campaign].some(t => {
+                    return t.customFX && t.customFX.toLowerCase().includes('highlight');
+                });
                 if (hasHighlight) {
                     section.classList.add('highlight-fx');
                 }
