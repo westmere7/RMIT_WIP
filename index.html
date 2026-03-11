@@ -1242,45 +1242,65 @@
             }
         }
 
-        /* Highlight FX - Animated Header Gradient */
+        /* Highlight FX - Modern Animated Gradient Outline */
         .project-section.highlight-fx {
-            /* No border/shadow on the card itself */
-            box-shadow: 0 8px 32px rgba(230, 30, 42, 0.15);
+            position: relative;
+            /* Extra bottom margin if needed or keep existing */
         }
 
-        .project-section.highlight-fx h2 {
-            background: linear-gradient(90deg,
-                    #E61E2A 0%,
-                    #ff5e69 25%,
-                    #E61E2A 50%,
-                    #c71824 75%,
-                    #E61E2A 100%);
-            background-size: 200% 100%;
-            animation: header-shine 3s linear infinite;
+        /* The pseudo-element forms the gradient border */
+        .project-section.highlight-fx::before {
+            content: "";
+            position: absolute;
+            inset: -2px; /* Pulls the border outside of the container by 2px */
+            border-radius: 22px; /* Slightly larger than the 20px card border-radius */
+            padding: 2px; /* Thickness of the gradient border */
+            
+            /* The modern red/orange gradient */
+            background: linear-gradient(
+                90deg, 
+                #E61E2A 0%, 
+                #FF7A00 25%, 
+                #E61E2A 50%, 
+                #FF9500 75%, 
+                #E61E2A 100%
+            );
+            background-size: 200% auto;
+            
+            /* CSS Mask magic to hollow out the middle so the card shows through */
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            
+            /* Prevent clicks on the border blocking the card */
+            pointer-events: none;
+            
+            /* Animation for moving gradient */
+            animation: move-gradient 3s linear infinite;
         }
 
-        @keyframes header-shine {
-            0% {
-                background-position: 100% 0;
-            }
-
-            100% {
-                background-position: -100% 0;
-            }
+        /* Optional extra subtle glow behind the card */
+        .project-section.highlight-fx::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(230,30,42,0.1) 0%, rgba(255,122,0,0.1) 100%);
+            z-index: -1;
+            filter: blur(8px);
+            animation: pulse-glow 3s ease-in-out infinite alternate;
+            pointer-events: none;
         }
 
-        @keyframes gradient-shine {
-            0% {
-                background-position: 0% 50%;
-            }
+        @keyframes move-gradient {
+            0% { background-position: 0% center; }
+            100% { background-position: -200% center; }
+        }
 
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
+        @keyframes pulse-glow {
+            0% { opacity: 0.5; filter: blur(6px); }
+            100% { opacity: 1; filter: blur(12px); }
         }
     </style>
 </head>
